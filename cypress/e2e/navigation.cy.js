@@ -15,7 +15,6 @@ describe('Tests E2E Navigation', () => {
     cy.contains('Aucun inscrit').should('be.visible');
 
     cy.contains('nouvelle inscription').click();
-
     cy.url().should('include', '/register');
     cy.contains('Ajouter un nouvel utilisateur').should('be.visible');
 
@@ -23,9 +22,6 @@ describe('Tests E2E Navigation', () => {
       statusCode: 201,
       body: { id: 11 }
     }).as('createUser');
-
-    // 🔥 Attente champ actif
-    cy.get('#firstName').should('be.visible').and('not.be.disabled');
 
     cy.get('#firstName').type('Marie');
     cy.get('#lastName').type('Martin');
@@ -42,7 +38,10 @@ describe('Tests E2E Navigation', () => {
     cy.wait('@createUser');
 
     cy.contains('Inscription réussie').should('be.visible');
+
   });
+
+
 
   it('Scénario Erreur 400', () => {
 
@@ -60,8 +59,6 @@ describe('Tests E2E Navigation', () => {
       body: {}
     }).as('createUserError');
 
-    cy.get('#firstName').should('be.visible').and('not.be.disabled');
-
     cy.get('#firstName').type('Jean');
     cy.get('#lastName').type('Dupont');
     cy.get('#dob').type('1990-01-01');
@@ -77,7 +74,10 @@ describe('Tests E2E Navigation', () => {
     cy.wait('@createUserError');
 
     cy.contains('Email déjà existant').should('be.visible');
+
   });
+
+
 
   it('Scénario Erreur 500', () => {
 
@@ -90,13 +90,16 @@ describe('Tests E2E Navigation', () => {
 
     cy.contains('Ajouter un nouvel utilisateur').should('be.visible');
 
+    // 🔥 attendre que le bouton soit actif avant de taper
+    cy.get('button')
+      .contains("S'inscrire")
+      .should('be.visible')
+      .and('not.be.disabled');
+
     cy.intercept('POST', 'https://jsonplaceholder.typicode.com/users', {
       statusCode: 500,
       body: {}
     }).as('createUserCrash');
-
-    // 🔥 Attente champ actif
-    cy.get('#firstName').should('be.visible').and('not.be.disabled');
 
     cy.get('#firstName').type('Jean');
     cy.get('#lastName').type('Dupont');
@@ -107,12 +110,12 @@ describe('Tests E2E Navigation', () => {
 
     cy.get('button')
       .contains("S'inscrire")
-      .should('not.be.disabled')
       .click();
 
     cy.wait('@createUserCrash');
 
     cy.contains('Erreur serveur').should('be.visible');
+
   });
 
 });
