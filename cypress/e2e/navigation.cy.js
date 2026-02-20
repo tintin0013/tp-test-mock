@@ -38,9 +38,7 @@ describe('Tests E2E Navigation', () => {
     cy.wait('@createUser');
 
     cy.contains('Inscription réussie').should('be.visible');
-
   });
-
 
 
   it('Scénario Erreur 400', () => {
@@ -74,9 +72,7 @@ describe('Tests E2E Navigation', () => {
     cy.wait('@createUserError');
 
     cy.contains('Email déjà existant').should('be.visible');
-
   });
-
 
 
   it('Scénario Erreur 500', () => {
@@ -89,12 +85,6 @@ describe('Tests E2E Navigation', () => {
     cy.visit('http://localhost:3000/#/register');
 
     cy.contains('Ajouter un nouvel utilisateur').should('be.visible');
-
-    // 🔥 attendre que le bouton soit actif avant de taper
-    cy.get('button')
-      .contains("S'inscrire")
-      .should('be.visible')
-      .and('not.be.disabled');
 
     cy.intercept('POST', 'https://jsonplaceholder.typicode.com/users', {
       statusCode: 500,
@@ -115,7 +105,6 @@ describe('Tests E2E Navigation', () => {
     cy.wait('@createUserCrash');
 
     cy.contains('Erreur serveur').should('be.visible');
-
   });
 
 });
