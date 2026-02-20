@@ -4,7 +4,6 @@ describe('Tests E2E Navigation', () => {
 
   it('Scénario classique', () => {
 
-    // Mock GET AVANT visit
     cy.intercept('GET', 'https://jsonplaceholder.typicode.com/users', {
       statusCode: 200,
       body: []
@@ -19,7 +18,6 @@ describe('Tests E2E Navigation', () => {
 
     cy.contains('nouvelle inscription').click();
 
-    // Synchronisation sur élément stable
     cy.contains('Ajouter un nouvel utilisateur', { timeout: 10000 }).should('be.visible');
 
     cy.intercept('POST', 'https://jsonplaceholder.typicode.com/users', {
@@ -45,13 +43,8 @@ describe('Tests E2E Navigation', () => {
 
   it('Scénario Erreur 400', () => {
 
-    // Mock GET AVANT visit
-    cy.intercept('GET', 'https://jsonplaceholder.typicode.com/users', {
-      statusCode: 200,
-      body: []
-    }).as('getUsers');
+    // ⚠️ PAS de GET ici
 
-    // Mock POST 400 AVANT interaction
     cy.intercept('POST', 'https://jsonplaceholder.typicode.com/users', {
       statusCode: 400,
       body: {}
@@ -59,9 +52,6 @@ describe('Tests E2E Navigation', () => {
 
     cy.visit(`${baseUrl}/#/register`);
 
-    cy.wait('@getUsers');
-
-    // Synchronisation sur élément stable
     cy.contains('Ajouter un nouvel utilisateur', { timeout: 10000 }).should('be.visible');
 
     cy.get('#firstName').should('be.visible').type('Jean');
@@ -82,14 +72,14 @@ describe('Tests E2E Navigation', () => {
 
   it.skip('Scénario Erreur 500', () => {
 
-    cy.visit(`${baseUrl}/#/register`);
-
-    cy.contains('Ajouter un nouvel utilisateur', { timeout: 10000 }).should('be.visible');
-
     cy.intercept('POST', 'https://jsonplaceholder.typicode.com/users', {
       statusCode: 500,
       body: {}
     }).as('createUserCrash');
+
+    cy.visit(`${baseUrl}/#/register`);
+
+    cy.contains('Ajouter un nouvel utilisateur', { timeout: 10000 }).should('be.visible');
 
     cy.get('#firstName').type('Jean');
     cy.get('#lastName').type('Dupont');
