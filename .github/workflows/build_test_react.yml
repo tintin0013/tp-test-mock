@@ -1,6 +1,5 @@
 name: Build and Test React Application 
 
-# Déclenchement du workflow sur push ou pull request sur main
 on:
   push:
     branches: [ main ]
@@ -16,56 +15,43 @@ jobs:
         node-version: [18.x]
 
     steps:
-      # Récupération du code du repository
       - uses: actions/checkout@v3
       
-      # Installation de Node.js
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
         
-      # Installation des dépendances (à la racine du projet)
       - name: Install dependencies
         run: npm ci
 
-      # Génération de la documentation JSDoc
       - name: Generate JSDoc
         run: npm run jsdoc
 
-      # Lancement des tests unitaires avec génération du coverage
       - name: Run unit tests
         run: npm test
 
-      # Upload du coverage vers Codecov (avec token)
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v3
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
 
-      # Lancement des tests Cypress E2E
       - name: Cypress run
         uses: cypress-io/github-action@v6
         with:
-          # Démarre le serveur React
           start: npm start
-          # Attend que le serveur soit accessible
-          wait-on: http://localhost:3000
-          # Utilise Chrome (plus stable que Electron)
+          wait-on: http://localhost:3000/tp-test-mock
           browser: chrome
 
-      # Build du projet React
       - name: Build project
         run: |
           npm run build
           mkdir -p build/docs
           cp -r public/docs/* build/docs/
 
-      # Configuration GitHub Pages
       - name: Setup Pages
         uses: actions/configure-pages@v3
         
-      # Upload du dossier build pour le déploiement
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
@@ -80,6 +66,5 @@ jobs:
     environment: 
       name: github-pages
     steps:
-      # Déploiement automatique sur GitHub Pages
       - name: Deploy to Github Pages
         uses: actions/deploy-pages@v4
