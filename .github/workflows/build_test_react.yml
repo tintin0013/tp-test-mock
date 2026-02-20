@@ -29,9 +29,19 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      # Lancement des tests unitaires
+      # Génération de la documentation JSDoc
+      - name: Generate JSDoc
+        run: npm run jsdoc
+
+      # Lancement des tests unitaires avec génération du coverage
       - name: Run unit tests
-        run: npm test -- --watchAll=false
+        run: npm test -- --watchAll=false --coverage
+
+      # Upload du coverage vers Codecov (avec token)
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
 
       # Lancement des tests Cypress E2E
       - name: Cypress run
@@ -46,7 +56,10 @@ jobs:
 
       # Build du projet React
       - name: Build project
-        run: npm run build
+        run: |
+          npm run build
+          mkdir -p build/docs
+          cp -r docs/* build/docs/
 
       # Configuration GitHub Pages
       - name: Setup Pages
