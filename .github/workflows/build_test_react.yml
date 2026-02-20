@@ -1,8 +1,7 @@
 name: Build and Test React Application 
 
-# Déclenchement du workflow
+# Déclenchement du workflow sur push ou pull request sur main
 on:
-  # Lancement sur push ou pull request sur la branche main
   push:
     branches: [ main ]
   pull_request:
@@ -26,35 +25,28 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
         
-      # Installation propre des dépendances
+      # Installation des dépendances (à la racine du projet)
       - name: Install dependencies
-        run: |
-          cd my-app
-          npm ci
+        run: npm ci
 
       # Lancement des tests unitaires
       - name: Run unit tests
-        run: |
-          cd my-app
-          npm test -- --watchAll=false
+        run: npm test -- --watchAll=false
 
       # Lancement des tests Cypress E2E
       - name: Cypress run
         uses: cypress-io/github-action@v6
         with:
-          working-directory: my-app
           # Démarre le serveur React
           start: npm start
           # Attend que le serveur soit accessible
           wait-on: http://localhost:3000
-          # Utilise Chrome (plus stable qu'Electron en CI)
+          # Utilise Chrome (plus stable que Electron)
           browser: chrome
 
       # Build du projet React
       - name: Build project
-        run: |
-          cd my-app
-          npm run build
+        run: npm run build
 
       # Configuration GitHub Pages
       - name: Setup Pages
@@ -64,10 +56,9 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: my-app/build
+          path: build
           
   deploy:
-    # Le déploiement dépend du succès du job précédent
     needs: build_test
     permissions: 
       pages: write
