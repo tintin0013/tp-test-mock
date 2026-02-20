@@ -16,7 +16,6 @@ function Form({ onSubmitSuccess }) {
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Validation en temps réel pour chaque champ
   const validateField = useCallback((name, value) => {
 
     const newErrors = { ...errors };
@@ -87,7 +86,6 @@ function Form({ onSubmitSuccess }) {
 
 
 
-  // Validation complète du formulaire
   const isFormValid = useCallback(() => {
 
     return (
@@ -158,6 +156,8 @@ function Form({ onSubmitSuccess }) {
     } catch (error) {
 
       console.error('Erreur finale:', error);
+
+      setIsSubmitting(false);
 
     } finally {
 
