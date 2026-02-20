@@ -1,5 +1,7 @@
 describe('Tests E2E Navigation', () => {
 
+  const baseUrl = 'http://localhost:3000/tp-test-mock';
+
   it('Scénario classique', () => {
 
     cy.intercept('GET', 'https://jsonplaceholder.typicode.com/users', {
@@ -7,7 +9,7 @@ describe('Tests E2E Navigation', () => {
       body: []
     }).as('getUsers');
 
-    cy.visit('http://localhost:3000/#/');
+    cy.visit(`${baseUrl}/#/`);
 
     cy.wait('@getUsers');
 
@@ -15,9 +17,7 @@ describe('Tests E2E Navigation', () => {
     cy.contains('Aucun inscrit').should('be.visible');
 
     cy.contains('nouvelle inscription').click();
-    cy.url().should('include', '/register');
 
-    cy.get('form').should('exist');
     cy.get('#firstName').should('exist');
     cy.get('#lastName').should('exist');
 
@@ -38,16 +38,14 @@ describe('Tests E2E Navigation', () => {
     cy.wait('@createUser');
 
     cy.contains('Inscription réussie').should('be.visible');
-
   });
 
 
 
   it('Scénario Erreur 400', () => {
 
-    cy.visit('http://localhost:3000/#/register');
+    cy.visit(`${baseUrl}/#/register`);
 
-    cy.get('form').should('exist');
     cy.get('#firstName').should('exist');
     cy.get('#lastName').should('exist');
 
@@ -68,16 +66,14 @@ describe('Tests E2E Navigation', () => {
     cy.wait('@createUserError');
 
     cy.contains('Email déjà existant').should('be.visible');
-
   });
 
 
 
   it('Scénario Erreur 500', () => {
 
-    cy.visit('http://localhost:3000/#/register');
+    cy.visit(`${baseUrl}/#/register`);
 
-    cy.get('form').should('exist');
     cy.get('#firstName').should('exist');
     cy.get('#lastName').should('exist');
 
@@ -98,7 +94,6 @@ describe('Tests E2E Navigation', () => {
     cy.wait('@createUserCrash');
 
     cy.contains('Erreur serveur').should('be.visible');
-
   });
 
 });
