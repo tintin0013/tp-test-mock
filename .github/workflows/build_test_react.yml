@@ -1,0 +1,81 @@
+name: Build and Test React Application 
+
+# Déclenchement du workflow
+on:
+  # Lancement sur push ou pull request sur la branche main
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build_test:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [18.x]
+
+    steps:
+      # Récupération du code du repository
+      - uses: actions/checkout@v3
+      
+      # Installation de Node.js
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+        
+      # Installation propre des dépendances
+      - name: Install dependencies
+        run: |
+          cd my-app
+          npm ci
+
+      # Lancement des tests unitaires
+      - name: Run unit tests
+        run: |
+          cd my-app
+          npm test -- --watchAll=false
+
+      # Lancement des tests Cypress E2E
+      - name: Cypress run
+        uses: cypress-io/github-action@v6
+        with:
+          working-directory: my-app
+          # Démarre le serveur React
+          start: npm start
+          # Attend que le serveur soit accessible
+          wait-on: http://localhost:3000
+          # Utilise Chrome (plus stable qu'Electron en CI)
+          browser: chrome
+
+      # Build du projet React
+      - name: Build project
+        run: |
+          cd my-app
+          npm run build
+
+      # Configuration GitHub Pages
+      - name: Setup Pages
+        uses: actions/configure-pages@v3
+        
+      # Upload du dossier build pour le déploiement
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: my-app/build
+          
+  deploy:
+    # Le déploiement dépend du succès du job précédent
+    needs: build_test
+    permissions: 
+      pages: write
+      id-token: write
+    runs-on: ubuntu-latest
+    environment: 
+      name: github-pages
+    steps:
+      # Déploiement automatique sur GitHub Pages
+      - name: Deploy to Github Pages
+        uses: actions/deploy-pages@v4
