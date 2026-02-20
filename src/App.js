@@ -1,9 +1,10 @@
-import { HashRouter, Routes, Route } from "react-router-dom";
+import { HashRouter, Routes, Route, Link } from "react-router-dom";
 import Home from "./components/Home";
 import Register from "./components/Register";
 import { useState } from "react";
 
 function App() {
+
   const [users, setUsers] = useState([]);
 
   const addUser = (newUser) => {
@@ -13,17 +14,28 @@ function App() {
   return (
     <HashRouter>
       <div className="App">
-        
+
+        {/* Navigation globale */}
+        <nav style={{ marginBottom: "20px" }}>
+          <Link to="/" style={{ marginRight: "15px" }}>
+            Accueil
+          </Link>
+          <Link to="/register">
+            nouvelle inscription
+          </Link>
+        </nav>
+
         <Routes>
           <Route 
             path="/"
-            element={<Home users={users} userCount={users.length} />} 
+            element={<Home />} 
           />
           <Route 
             path="/register" 
             element={<Register onUserAdded={addUser} />} 
           />
         </Routes>
+
       </div>
     </HashRouter>
   );

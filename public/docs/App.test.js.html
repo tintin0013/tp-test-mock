@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: App.test.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: App.test.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import App from './App';
+import userEvent from '@testing-library/user-event';
+
+/**
+ * @function App
+ */
+
+//verifie l'affichage de la page d'accueil
+describe('App', () => {
+  it('affiche la page d\'accueil par défaut', () => {
+    render(&lt;App />);
+    expect(screen.getByText(/Bienvenue sur votre annuaire/i)).toBeInTheDocument();
+  });
+
+  it('affiche la navigation entre Accueil et Inscription', async () => {
+    render(&lt;App />);
+    
+    // Clic sur "S'inscrire"
+    const registerLink = screen.getByRole('link', { name: /Nouvelle inscription/i });
+    fireEvent.click(registerLink);
+    expect(screen.getByText(/Ajouter un nouvel utilisateur/i)).toBeInTheDocument();
+  });
+
+});
+
+
+//test les ajouts utilisateurs
+
+describe('App - addUser', () => {
+  beforeEach(() => {
+    // Nettoie localStorage AVANT chaque test
+    localStorage.clear();
+  });
+
+  it('ajoute un utilisateur via le formulaire et met à jour le compteur', async () => {
+    render(&lt;App />);
+
+    await waitFor(() => screen.getByText(/Ajouter un nouvel utilisateur/i));
+    
+    // Remplit formulaire (vrai flux utilisateur)
+    const prenomInput = screen.getByLabelText(/Prénom/i);
+    const nomInput = screen.getByLabelText(/Nom de famille/i);
+    const dateInput = screen.getByLabelText(/Date de naissance/i);
+    const email = screen.getByLabelText(/Email/i);
+    const ville = screen.getByLabelText(/Ville/i);
+    const codePostal = screen.getByLabelText(/Code postal/i);
+    
+    fireEvent.change(prenomInput, { target: { value: 'Marie' } });
+    fireEvent.change(nomInput, { target: { value: 'Martin' } });
+    fireEvent.change(dateInput, { target: { value: '1990-01-01' } });
+    fireEvent.change(email, { target: { value: 'test@test.fr' } });
+    fireEvent.change(ville, { target: { value: 'Angers' } });
+    fireEvent.change(codePostal, { target: { value: '12345' } });
+    
+    // Soumet (simule `addUser`)
+    fireEvent.click(screen.getByRole('button', { name: /S'inscrire/i }));
+    
+    // Vérifie redirection + compteur +1
+    await waitFor(() => {
+      expect(localStorage.getItem('users')).not.toBeNull();
+    }, { timeout: 3000 });
+    
+    const users = JSON.parse(localStorage.getItem('users') || '[]');
+    expect(users).toHaveLength(1);  
+    expect(users[0].firstName).toBe('Marie');
+    expect(users[0].lastName).toBe('Martin');
+
+  });
+
+  it('navigue vers Home après soumission réussie (2s)', async () => {
+    render(&lt;App />);
+    
+    await waitFor(() => screen.getByText(/Ajouter un nouvel utilisateur/i));
+    
+    // Remplit formulaire COMPLET
+    await userEvent.type(screen.getByLabelText(/Prénom/i), 'Marie');
+    await userEvent.type(screen.getByLabelText(/Nom de famille/i), 'Martin');
+    await userEvent.type(screen.getByLabelText(/Date de naissance/i), '1990-01-01');
+    await userEvent.type(screen.getByLabelText(/Email/i), 'marie@test.fr');
+    await userEvent.type(screen.getByLabelText(/Ville/i), 'Angers');
+    await userEvent.type(screen.getByLabelText(/Code postal/i), '49100');
+    
+    // Soumet → déclenche handleSubmitSuccess
+    await userEvent.click(screen.getByRole('button', { name: /S'inscrire/i }));
+    
+    // Attend TOAST (1s)
+    await waitFor(() => {
+      expect(screen.getByText(/Inscription réussie/i)).toBeInTheDocument();
+    });
+    
+    // Attend 4s
+    await waitFor(() => {
+      expect(screen.getByText(/Bienvenue sur votre annuaire/i)).toBeInTheDocument();
+    }, { timeout: 4000 });
+    
+    // Vérifie localStorage + Home rendu
+    const users = JSON.parse(localStorage.getItem('users') || '[]');
+    expect(users).toHaveLength(1);
+    expect(users[0].firstName).toBe('Marie');
+  });
+});
+
+
+describe('App - setUsers', () => {
+  beforeEach(() => {
+    localStorage.clear();
+  });
+
+  it('setUsers incrémente le compteur après ajout', async () => {
+    render(&lt;App />);
+    
+    // Compteur initial = 0
+    expect(JSON.parse(localStorage.getItem('users') || '[]')).toHaveLength(0);
+    
+    // Va sur Register + remplit formulaire
+    await userEvent.click(screen.getByRole('link', { name: /nouvelle inscription/i }));
+    await waitFor(() => screen.getByText(/Ajouter un nouvel utilisateur/i));
+    
+    await userEvent.type(screen.getByLabelText(/Prénom/i), 'Marie');
+    await userEvent.type(screen.getByLabelText(/Nom de famille/i), 'Martin');
+    await userEvent.type(screen.getByLabelText(/Date de naissance/i), '1990-01-01');
+    await userEvent.type(screen.getByLabelText(/Email/i), 'marie@test.fr');
+    await userEvent.type(screen.getByLabelText(/Ville/i), 'Angers');
+    await userEvent.type(screen.getByLabelText(/Code postal/i), '49100');
+    
+    // Soumet → addUser → setUsers([...users, newUser])
+    await userEvent.click(screen.getByRole('button', { name: /S'inscrire/i }));
+    
+    // Attend redirection + setUsers effet (2s)
+    await waitFor(() => {
+      expect(JSON.parse(localStorage.getItem('users') || '[]')).toHaveLength(1); 
+    }, { timeout: 4000 });
+  });
+});
+
+
+/*
+test('renders learn react link', () => {
+  render(&lt;App />);
+  const linkElement = screen.getByText(/learn react/i);
+  expect(linkElement).toBeInTheDocument();
+});
+
+test('renders learn react link', () => {
+  render(&lt;App />);
+  const linkElement = screen.getByRole("link");
+  expect(linkElement).toBeInTheDocument();
+  expect(linkElement).toHaveTextContent("Learn React");
+});
+
+test('renders code app', () => {
+  render(&lt;App />);
+  const codeElement = screen.getByTestId("code-app");
+  expect(codeElement).toBeInTheDocument();
+  expect(codeElement).toHaveTextContent("src/App.js");
+});
+
+test('check counter on click me button', () => {
+  render(&lt;App />);
+  const button = screen.getByRole('button');
+  const counter = screen.getByTestId('count')
+  expect(button).toBeInTheDocument();
+  expect(counter).toBeInTheDocument();
+  expect(counter).toHaveTextContent("0");
+  fireEvent.click(button);
+  expect(counter).toHaveTextContent("1");
+});
+*/
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#App">App</a></li><li><a href="global.html#Home">Home</a></li><li><a href="global.html#calculateAge">calculateAge</a></li><li><a href="global.html#calculateAgeTestsunitairespourlafonctioncalculateAgeLafonctiondoitretournerl'%25C3%25A2ged'unepersonneenann%25C3%25A9es,enfonctiondesadatedenaissance.">calculateAge
+Tests unitaires pour la fonction calculateAge
+La fonction doit retourner l'âge d'une personne en années, en fonction de sa date de naissance.</a></li><li><a href="global.html#handleSubmit">handleSubmit</a></li><li><a href="global.html#validateCity">validateCity</a></li><li><a href="global.html#validateField">validateField</a></li><li><a href="global.html#validateForm">validateForm</a></li><li><a href="global.html#validateFormTestsunitairespourlafonctionvalidateForm">validateForm
+Tests unitaires pour la fonction validateForm</a></li><li><a href="global.html#validatePostalCode">validatePostalCode</a></li><li><a href="global.html#validatePostalCodeTestsunitairespourlavalidationducodepostal">validatePostalCode
+Tests unitaires pour la validation du code postal</a></li><li><a href="global.html#verifyIdentityTestsunitairespourlafonctionverifyIdentity">verifyIdentity
+Tests unitaires pour la fonction verifyIdentity</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.5</a> on Fri Feb 20 2026 12:43:45 GMT+0100 (Central European Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

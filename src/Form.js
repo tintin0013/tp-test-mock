@@ -1,9 +1,9 @@
 import { useState, useCallback } from 'react';
-import { toast } from 'react-toastify';
 import validateForm from './module/validator.js';
 import './Form.css';
 
 function Form({ onSubmitSuccess }) {
+
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -12,43 +12,32 @@ function Form({ onSubmitSuccess }) {
     city: '',
     postalCode: ''
   });
+
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Validation en temps réel pour chaque champ
   const validateField = useCallback((name, value) => {
+
     const newErrors = { ...errors };
 
     try {
+
       switch (name) {
+
         case 'firstName':
         case 'lastName':
-          if (!value.trim()) {
+          if (!value.trim() || !/^[A-Za-zÀ-ÿ\s-]+$/.test(value)) {
             newErrors[name] = 'Attention ! Vos prénoms et noms ne doivent contenir que des lettres';
           } else {
-            const identity = { name: `${formData.firstName} ${formData.lastName}`.trim() || value };
-            validateForm(
-              { birth: new Date('2000-01-01') }, 
-              '75001', 
-              'Paris', 
-              identity, 
-              'test@test.com'
-            );
             delete newErrors[name];
           }
           break;
 
         case 'email':
-          if (!value.trim()) {
+          if (!value.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
             newErrors[name] = 'Email invalide';
           } else {
-            validateForm(
-              { birth: new Date('2000-01-01') }, 
-              '75001', 
-              'Paris', 
-              { name: 'Test' }, 
-              value
-            );
             delete newErrors[name];
           }
           break;
@@ -57,133 +46,132 @@ function Form({ onSubmitSuccess }) {
           if (!value) {
             newErrors[name] = 'Vous devez avoir au moins 18 ans';
           } else {
-            const age = { birth: new Date(value) };
-            validateForm(age, '75001', 'Paris', { name: 'Test' }, 'test@test.com');
-            delete newErrors[name];
+            const birthDate = new Date(value);
+            const today = new Date();
+            const age = today.getFullYear() - birthDate.getFullYear();
+            if (age < 18) {
+              newErrors[name] = 'Vous devez avoir au moins 18 ans';
+            } else {
+              delete newErrors[name];
+            }
           }
           break;
 
         case 'city':
-          if (!value.trim()) {
+          if (!value.trim() || !/^[A-Za-zÀ-ÿ\s-]+$/.test(value)) {
             newErrors[name] = 'Veuillez saisir une ville valide';
           } else {
-            validateForm(
-              { birth: new Date('2000-01-01') }, 
-              '75001', 
-              value, 
-              { name: 'Test' }, 
-              'test@test.com'
-            );
             delete newErrors[name];
           }
           break;
 
         case 'postalCode':
-          if (!value.trim()) {
+          if (!/^\d{5}$/.test(value)) {
             newErrors[name] = 'Veuillez entrer un code postal valide (5 chiffres)';
           } else {
-            validateForm(
-              { birth: new Date('2000-01-01') }, 
-              value, 
-              'Paris', 
-              { name: 'Test' }, 
-              'test@test.com'
-            );
             delete newErrors[name];
           }
           break;
+
         default:
           break;
       }
+
     } catch (error) {
-      switch (name) {
-        case 'firstName':
-        case 'lastName':
-          newErrors[name] = 'Attention ! Vos prénoms et noms ne doivent contenir que des lettres';
-          break;
-        case 'email':
-          newErrors[name] = 'Email invalide';
-          break;
-        case 'dob':
-          newErrors[name] = 'Vous devez avoir au moins 18 ans';
-          break;
-        case 'city':
-          newErrors[name] = 'Veuillez saisir une ville valide';
-          break;
-        case 'postalCode':
-          newErrors[name] = 'Veuillez entrer un code postal valide (5 chiffres)';
-          break;
-        default:
-          newErrors[name] = 'Erreur de validation';
-      }
+      newErrors[name] = 'Erreur de validation';
     }
 
     setErrors(newErrors);
-  }, [formData.firstName, formData.lastName, errors]);
+
+  }, [errors]);
+
+
 
   // Validation complète du formulaire
   const isFormValid = useCallback(() => {
-    return Object.keys(errors).length === 0 &&
-           formData.firstName.trim() &&
-           formData.lastName.trim() &&
-           formData.email.trim() &&
-           formData.dob &&
-           formData.city.trim() &&
-           /^\d{5}$/.test(formData.postalCode);
+
+    return (
+      Object.keys(errors).length === 0 &&
+      formData.firstName.trim() &&
+      formData.lastName.trim() &&
+      formData.email.trim() &&
+      formData.dob &&
+      formData.city.trim() &&
+      /^\d{5}$/.test(formData.postalCode)
+    );
+
   }, [formData, errors]);
 
+
+
   const handleChange = (e) => {
+
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-    
-    // Validation temps réel
+
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+
     validateField(name, value);
   };
 
+
+
   const handleSubmit = async (e) => {
+
     e.preventDefault();
-    
+
     setIsSubmitting(true);
-    
+
     try {
+
       const age = { birth: new Date(formData.dob) };
       const identity = { name: `${formData.firstName} ${formData.lastName}`.trim() };
-      validateForm(age, formData.postalCode, formData.city, identity, formData.email);
 
-      // ✅ userData SEULEMENT (PAS localStorage)
-      const userData = { 
-        ...formData, 
-        fullName: identity.name,
-        timestamp: Date.now() 
+      validateForm(
+        age,
+        formData.postalCode,
+        formData.city,
+        identity,
+        formData.email
+      );
+
+      const userData = {
+        ...formData,
+        fullName: identity.name
       };
 
-      // ✅ APPEL PARENT (Register gère localStorage)
-      onSubmitSuccess(userData);
-      
-      // Toaster succès
-      toast.success('Inscription réussie !', {
-        position: "top-right",
-        autoClose: 3000,
-        hideProgressBar: false,
-      });
-      
-      // Reset formulaire
+      await onSubmitSuccess(userData);
+
       setFormData({
-        firstName: '', lastName: '', email: '', dob: '', city: '', postalCode: ''
+        firstName: '',
+        lastName: '',
+        email: '',
+        dob: '',
+        city: '',
+        postalCode: ''
       });
+
       setErrors({});
-      
+
     } catch (error) {
+
       console.error('Erreur finale:', error);
+
     } finally {
+
       setIsSubmitting(false);
+
     }
   };
+
+
 
   return (
     <div className="form-container">
       <form onSubmit={handleSubmit} className="form">
-        {/* Prénom */}
+
         <div className="form-field">
           <label htmlFor="firstName">Prénom :</label>
           <input
@@ -201,7 +189,6 @@ function Form({ onSubmitSuccess }) {
           )}
         </div>
 
-        {/* Nom */}
         <div className="form-field">
           <label htmlFor="lastName">Nom de famille :</label>
           <input
@@ -219,7 +206,6 @@ function Form({ onSubmitSuccess }) {
           )}
         </div>
 
-        {/* Email */}
         <div className="form-field">
           <label htmlFor="email">Email :</label>
           <input
@@ -237,7 +223,6 @@ function Form({ onSubmitSuccess }) {
           )}
         </div>
 
-        {/* Date de naissance */}
         <div className="form-field">
           <label htmlFor="dob">Date de naissance :</label>
           <input
@@ -256,7 +241,6 @@ function Form({ onSubmitSuccess }) {
           )}
         </div>
 
-        {/* Ville */}
         <div className="form-field">
           <label htmlFor="city">Ville :</label>
           <input
@@ -274,7 +258,6 @@ function Form({ onSubmitSuccess }) {
           )}
         </div>
 
-        {/* Code postal */}
         <div className="form-field">
           <label htmlFor="postalCode">Code postal :</label>
           <input
@@ -293,13 +276,14 @@ function Form({ onSubmitSuccess }) {
           )}
         </div>
 
-        <button 
-          type="submit" 
+        <button
+          type="submit"
           className="Home-button"
           disabled={!isFormValid() || isSubmitting}
         >
-          {isSubmitting ? 'Enregistrement...' : 'S\'inscrire'}
+          {isSubmitting ? 'Enregistrement...' : "S'inscrire"}
         </button>
+
       </form>
     </div>
   );

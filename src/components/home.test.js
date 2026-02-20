@@ -1,52 +1,67 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import Home from './Home';
 import { BrowserRouter } from "react-router-dom";
+import axios from 'axios';
 
-/**
- * @function Home
- */
-describe('Home - calcul âge réel', () => {
+jest.mock('axios');
+
+describe('Home - appels API mockés', () => {
+
   beforeEach(() => {
-    localStorage.clear();
+    jest.clearAllMocks();
   });
 
-  it('calcule et affiche l\'âge après inscription préalable', async () => {
-    // Pré-remplit localStorage avec user 
-    localStorage.setItem('users', JSON.stringify([{
-      firstName: 'Marie',
-      lastName: 'Martin',
-      dob: '1990-01-01', 
-      email: 'marie@test.fr',
-      city: 'Angers',
-      postalCode: '49100'
-    }]));
+  it('affiche les utilisateurs en cas de succès 200', async () => {
 
-    render(<Home />, {wrapper: BrowserRouter});
-    
-    // vérifie âge calculé
+    axios.get.mockResolvedValue({
+      data: [
+        {
+          id: 1,
+          firstName: 'Marie',
+          lastName: 'Martin',
+          email: 'marie@test.fr',
+          address: { city: 'Angers' }
+        }
+      ]
+    });
+
+    render(<Home />, { wrapper: BrowserRouter });
+
     await waitFor(() => {
       expect(screen.getByText('Marie')).toBeInTheDocument();
-      expect(screen.getByText('36')).toBeInTheDocument();  
+      expect(screen.getByText('Martin')).toBeInTheDocument();
+      expect(screen.getByText('1 utilisateur(s) inscrit(s)')).toBeInTheDocument();
     });
   });
 
-   it('calcule et affiche l\'âge après inscription préalable', async () => {
-    // Pré-remplit localStorage avec user 
-    localStorage.setItem('users', JSON.stringify([{
-      firstName: 'Marie',
-      lastName: 'Martin',
-      dob: '', 
-      email: 'marie@test.fr',
-      city: 'Angers',
-      postalCode: '49100'
-    }]));
+  it('affiche un message si le serveur renvoie une erreur 500', async () => {
 
-    render(<Home />, {wrapper: BrowserRouter});
-    
-    // vérifie âge calculé
+    axios.get.mockRejectedValue({
+      response: { status: 500 }
+    });
+
+    render(<Home />, { wrapper: BrowserRouter });
+
     await waitFor(() => {
-      expect(screen.getByText('Marie')).toBeInTheDocument();
-      expect(screen.getByText('N/A')).toBeInTheDocument();  
+      expect(
+        screen.getByText('Erreur serveur, impossible de récupérer les utilisateurs.')
+      ).toBeInTheDocument();
     });
   });
+
+  it('affiche "Aucun inscrit" si la liste est vide', async () => {
+
+    axios.get.mockResolvedValue({
+      data: []
+    });
+
+    render(<Home />, { wrapper: BrowserRouter });
+
+    await waitFor(() => {
+      expect(
+        screen.getByText('Aucun inscrit pour le moment')
+      ).toBeInTheDocument();
+    });
+  });
+
 });

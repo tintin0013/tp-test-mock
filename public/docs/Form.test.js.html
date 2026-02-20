@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: Form.test.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: Form.test.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import Register from './components/Register';
+import { BrowserRouter } from "react-router-dom";
+
+/**
+ * @function handleSubmit
+ */
+test('vérification de la présence de localStorage', () => { 
+    localStorage.setItem('test', 'ok'); 
+    expect(localStorage.getItem('test')).toBe('ok'); 
+});
+
+/**
+ * @function validateField
+ */
+ 
+// Test que le formulaire s'affiche correctement
+test('renders form fields', () => {
+    render(&lt;Register />, {wrapper: BrowserRouter});
+    expect(screen.getByLabelText(/Prénom/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/Nom de famille/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/Email/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/Date de naissance/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/Ville/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/Code postal/i)).toBeInTheDocument();
+});
+
+// Test qu'une erreur s'affiche si le champ prénom n'est pas rempli correctement
+test('shows error for invalid first name', async () => {
+    render(&lt;Register />, {wrapper: BrowserRouter});
+    const firstNameInput = screen.getByLabelText(/Prénom/i);
+    userEvent.type(firstNameInput, 'John123');
+    expect(screen.getByText(/Attention ! Vos prénoms et noms ne doivent contenir que des lettres/i)).toBeInTheDocument();
+});
+
+test('shows error for null first name', async () => {
+    render(&lt;Register />, {wrapper: BrowserRouter});
+    const firstNameInput = screen.getByLabelText(/Prénom/i);
+    userEvent.type(firstNameInput, ' ');
+    expect(screen.getByText(/Attention ! Vos prénoms et noms ne doivent contenir que des lettres/i)).toBeInTheDocument();
+});
+
+// Test qu'une erreur s'affiche si le champ email n'est pas rempli correctement
+test('shows error for invalid email', async () => {
+    render(&lt;Register />, {wrapper: BrowserRouter});
+    const emailInput = screen.getByLabelText(/Email/i);
+    userEvent.type(emailInput, 'invalid-email');
+    expect(screen.getByText(/Email invalide/i)).toBeInTheDocument();
+});
+/*
+test('shows error for null email', async () => {
+    render(&lt;Register />, {wrapper: BrowserRouter});
+    const emailInput = screen.getByLabelText(/Email/i);
+    userEvent.type(emailInput, ' ');
+    expect(screen.getByText(/Email invalide/i)).toBeInTheDocument();
+});
+*/
+// Test qu'une erreur s'affiche si le champ date de naissance n'est pas rempli correctement
+test('shows error for underage user', async () => {
+    render(&lt;Register />, {wrapper: BrowserRouter});
+    const dobInput = screen.getByLabelText(/Date de naissance/i);
+    userEvent.type(dobInput, '2010-01-01');
+    expect(screen.getByText(/Vous devez avoir au moins 18 ans/i)).toBeInTheDocument();
+});
+/*
+test('shows error for null date of birth', async () => {
+    render(&lt;Register />, {wrapper: BrowserRouter});
+    const dobInput = screen.getByLabelText(/Date de naissance/i);
+
+    userEvent.type(dobInput, '0000-00-00');  
+    expect(screen.getByText(/Vous devez avoir au moins 18 ans/i)).toBeInTheDocument();
+});
+*/
+test('shows error for null first name', async () => {
+    render(&lt;Register />, {wrapper: BrowserRouter});
+    const firstNameInput = screen.getByLabelText(/Prénom/i);
+    userEvent.type(firstNameInput, ' ');
+    expect(screen.getByText(/Attention ! Vos prénoms et noms ne doivent contenir que des lettres/i)).toBeInTheDocument();
+});
+
+// Test qu'une erreur s'affiche si le champ ville n'est pas rempli correctement
+test('shows error for invalid city', async () => {
+    render(&lt;Register />, {wrapper: BrowserRouter});
+    const cityInput = screen.getByLabelText(/Ville/i);
+    userEvent.type(cityInput, '12345');
+    expect(screen.getByText(/Veuillez saisir une ville valide/i)).toBeInTheDocument();
+});
+
+test('shows error for null city', async () => {
+    render(&lt;Register />, {wrapper: BrowserRouter});
+    const cityInput = screen.getByLabelText(/Ville/i);
+    userEvent.type(cityInput, ' ');
+    expect(screen.getByText(/Veuillez saisir une ville valide/i)).toBeInTheDocument();
+    
+});
+
+// Test qu'une erreur s'affiche si le champ code postal n'est pas rempli correctement
+test('shows error for invalid postal code', async () => {
+    render(&lt;Register />, {wrapper: BrowserRouter});
+    const postalCodeInput = screen.getByLabelText(/Code postal/i);
+    userEvent.type(postalCodeInput, 'ABCDE');
+    expect(screen.getByText(/Veuillez entrer un code postal valide \(5 chiffres\)/i)).toBeInTheDocument();
+});
+
+test('shows error for null postal code', async () => {
+    render(&lt;Register />, {wrapper: BrowserRouter});
+    const postalCodeInput = screen.getByLabelText(/Code postal/i);
+    userEvent.type(postalCodeInput, ' ');
+    expect(screen.getByText(/Veuillez entrer un code postal valide \(5 chiffres\)/i)).toBeInTheDocument();
+});
+
+// Test            
+test('shows error for invalid last name', async () => {
+    render(&lt;Register />, {wrapper: BrowserRouter});
+    const lastNameInput = screen.getByLabelText(/Nom de famille/i);
+    userEvent.type(lastNameInput, 'Doe123');
+    expect(screen.getByText(/Attention ! Vos prénoms et noms ne doivent contenir que des lettres/i)).toBeInTheDocument();
+});
+
+test('shows error for null last name', async () => {
+    render(&lt;Register />, {wrapper: BrowserRouter});
+    const lastNameInput = screen.getByLabelText(/Nom de famille/i);
+    userEvent.type(lastNameInput, ' ');
+    expect(screen.getByText(/Attention ! Vos prénoms et noms ne doivent contenir que des lettres/i)).toBeInTheDocument();
+});
+
+
+
+// Test le switch default
+test('default case handles unknown field gracefully', async () => {
+    render(&lt;Register />, {wrapper: BrowserRouter});
+    const input = screen.getAllByRole('textbox')[0]; 
+    
+    // Force un nom inexistant pour couvrir les 2 defaults
+    fireEvent.change(input, { 
+        target: { name: 'unknownField', value: 'test123' } 
+    });
+    
+    // premier default: break;
+    expect(screen.getByRole('button', { name: /S'inscrire/i })).toBeInTheDocument();
+    
+});
+
+test('default case in catch sets generic error for unknown field', async () => {
+    render(&lt;Register />, {wrapper: BrowserRouter});
+    
+    // ✅ Prend n'importe quel input existant
+    const input = screen.getByLabelText(/Prénom/i);
+    
+    // ✅ Force name inconnu = 1er switch default → catch → 2e switch default
+    fireEvent.change(input, { 
+        target: { 
+            name: 'unknownField',  // ← Déclenche les 2 defaults
+            value: 'invalid123' 
+        } 
+    });
+    
+    // Vérifie que le code s'exécute sans crash (les 2 defaults fonctionnent)
+    expect(screen.getByRole('button', { name: /S'inscrire/i })).toBeInTheDocument();
+});
+
+
+
+/**
+ * @function handleSubmit
+ */
+
+// Test que le formulaire se soumet correctement avec des données valides
+test('submits form with valid data', async () => {
+    render(&lt;Register />, {wrapper: BrowserRouter});
+    userEvent.type(screen.getByLabelText(/Prénom/i), 'John');
+    userEvent.type(screen.getByLabelText(/Nom de famille/i), 'Doe');
+    userEvent.type(screen.getByLabelText(/Email/i), 'john.doe@example.com');
+    userEvent.type(screen.getByLabelText(/Date de naissance/i), '1990-01-01');
+    userEvent.type(screen.getByLabelText(/Ville/i), 'Paris');
+    userEvent.type(screen.getByLabelText(/Code postal/i), '75001');
+    userEvent.click(screen.getByRole('button', { name: /S'inscrire/i }));
+
+});
+
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#App">App</a></li><li><a href="global.html#Home">Home</a></li><li><a href="global.html#calculateAge">calculateAge</a></li><li><a href="global.html#calculateAgeTestsunitairespourlafonctioncalculateAgeLafonctiondoitretournerl'%25C3%25A2ged'unepersonneenann%25C3%25A9es,enfonctiondesadatedenaissance.">calculateAge
+Tests unitaires pour la fonction calculateAge
+La fonction doit retourner l'âge d'une personne en années, en fonction de sa date de naissance.</a></li><li><a href="global.html#handleSubmit">handleSubmit</a></li><li><a href="global.html#validateCity">validateCity</a></li><li><a href="global.html#validateField">validateField</a></li><li><a href="global.html#validateForm">validateForm</a></li><li><a href="global.html#validateFormTestsunitairespourlafonctionvalidateForm">validateForm
+Tests unitaires pour la fonction validateForm</a></li><li><a href="global.html#validatePostalCode">validatePostalCode</a></li><li><a href="global.html#validatePostalCodeTestsunitairespourlavalidationducodepostal">validatePostalCode
+Tests unitaires pour la validation du code postal</a></li><li><a href="global.html#verifyIdentityTestsunitairespourlafonctionverifyIdentity">verifyIdentity
+Tests unitaires pour la fonction verifyIdentity</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.5</a> on Fri Feb 20 2026 12:43:45 GMT+0100 (Central European Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
