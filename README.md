@@ -1,89 +1,152 @@
 # Annuaire Utilisateurs React
 
-Application React avec routing, localStorage et stratégie complète de tests  
-(Unitaires + Intégration + E2E) avec CI/CD et déploiement automatique.
+Application React avec routing, architecture API découplée (Axios +
+JSONPlaceholder) et stratégie complète de tests (Unitaires +
+Intégration + E2E) avec CI/CD et déploiement automatique.
 
----
+------------------------------------------------------------------------
 
-## 🎯 Objectif pédagogique
+##  Objectif pédagogique
 
-Ce projet a pour objectif de mettre en place une architecture complète autour :
+Ce projet met en place une architecture complète autour de :
 
-- Tests unitaires
-- Tests d’intégration
-- Tests E2E avec Cypress
-- Couverture de code (Codecov)
-- Génération automatique de documentation (JSDoc)
-- Pipeline CI/CD avec GitHub Actions
-- Déploiement automatique via GitHub Pages
+-   Tests unitaires\
+-   Tests d'intégration\
+-   Tests E2E avec Cypress\
+-   Isolation du front-end via mocking des appels API\
+-   Gestion des erreurs serveur (400 / 500)\
+-   Couverture de code (Codecov)\
+-   Génération automatique de documentation (JSDoc)\
+-   Pipeline CI/CD avec GitHub Actions\
+-   Déploiement automatique via GitHub Pages
 
----
+------------------------------------------------------------------------
 
-## 🛠 Technologies
+##  Technologies
 
-- React  
-- React Router (HashRouter pour GitHub Pages)  
-- Jest (tests unitaires et intégration)  
-- Cypress (tests E2E)  
-- GitHub Actions (CI/CD)  
-- Codecov (suivi de couverture)  
-- GitHub Pages (déploiement)  
+-   React\
+-   React Router (HashRouter pour GitHub Pages)\
+-   Axios\
+-   JSONPlaceholder\
+-   Jest\
+-   Cypress\
+-   GitHub Actions\
+-   Codecov\
+-   GitHub Pages
 
----
+------------------------------------------------------------------------
 
-## 🚀 Fonctionnalités
+##  Fonctionnalités
 
-- Inscription d’utilisateurs avec validation
-- Stockage des utilisateurs dans le localStorage
-- Affichage dynamique de la liste des inscrits
-- Routing entre Home et Register
-- Validation métier (âge, email, code postal…)
-- Tests unitaires et d’intégration Jest
-- Tests End-To-End Cypress
-- Déploiement automatique à chaque push
+-   Inscription d'utilisateurs avec validation\
+-   Appels API via Axios (`GET /users`, `POST /users`)\
+-   Affichage dynamique de la liste des inscrits\
+-   Routing entre Home et Register\
+-   Validation métier (âge, email, code postal...)\
+-   Gestion des erreurs métier (400 -- email déjà existant)\
+-   Gestion des erreurs serveur (500 -- crash backend)\
+-   Tests unitaires et d'intégration Jest avec mocking\
+-   Tests E2E Cypress avec interception réseau\
+-   Déploiement automatique à chaque push
 
----
+------------------------------------------------------------------------
 
-## 📦 Livrables
+##  Évolution d'architecture
 
-- **Dépôt GitHub** :  
-  https://github.com/tintin0013/tp-test-mock  
+Le projet ne repose plus sur `localStorage`.
 
-- **Application déployée** :  
-  https://tintin0013.github.io/tp-test-mock/  
+L'application est désormais découplée du backend via :
 
-- **Documentation JSDoc** :  
-  https://tintin0013.github.io/tp-test-mock/docs/  
+-   Un service API : `src/services/api.js`\
+-   Axios pour les appels réseau\
+-   JSONPlaceholder comme API cible
 
-- **Tableau Codecov** :  
-  https://codecov.io/gh/tintin0013/tp-test-mock  
+Routes implémentées :
 
----
+-   GET /users\
+-   POST /users
 
-## 🏗 Organisation du projet
+Les composants ne connaissent pas Axios directement : ils passent par le
+service API.
 
-Le projet est structuré autour de :
+------------------------------------------------------------------------
 
-- `src/` → Application React (composants, logique métier, validations)
-- `module/` → Logique métier et règles de validation
-- `*.test.js` → Tests unitaires et d’intégration
-- `cypress/` → Tests End-To-End
-- `.github/workflows/` → Pipeline CI/CD
-- `public/docs/` → Documentation générée automatiquement
+##  Stratégie de Tests
 
----
+### Tests Jest (Unitaires + Intégration)
+
+Les appels API sont entièrement mockés :
+
+``` js
+jest.mock('axios')
+```
+
+Cas testés :
+
+-   Succès 200 (GET)
+-   Succès 201 (POST)
+-   Erreur métier 400
+-   Erreur serveur 500
+-   Gestion asynchrone avec `async/await`
+-   Utilisation de `waitFor` pour tester les changements d'état UI
+
+Aucun appel réseau réel ne sort des tests Jest.
+
+------------------------------------------------------------------------
+
+### Tests Cypress (E2E)
+
+Les appels API sont interceptés :
+
+``` js
+cy.intercept()
+```
+
+Cas simulés :
+
+-   GET 200
+-   POST 201
+-   POST 400
+-   POST 500
+
+Les tests E2E fonctionnent sans backend réel.
+
+------------------------------------------------------------------------
+
+##  Livrables
+
+-   Dépôt GitHub\
+    https://github.com/tintin0013/tp-test-mock
+
+-   Application déployée\
+    https://tintin0013.github.io/tp-test-mock/
+
+-   Documentation JSDoc\
+    https://tintin0013.github.io/tp-test-mock/docs/
+
+-   Tableau Codecov\
+    https://codecov.io/gh/tintin0013/tp-test-mock
+
+------------------------------------------------------------------------
+
+##  Organisation du projet
+
+-   `src/services/api.js` → Service Axios\
+-   `src/components/` → Home & Register\
+-   `src/module/` → Logique métier & validations\
+-   `*.test.js` → Tests Jest\
+-   `cypress/` → Tests E2E\
+-   `.github/workflows/` → Pipeline CI/CD\
+-   `public/docs/` → Documentation générée automatiquement
+
+------------------------------------------------------------------------
 
 ## ▶ Démarrage rapide
 
-```bash
-# Clone du projet
+``` bash
 git clone https://github.com/tintin0013/tp-test-mock.git
 cd tp-test-mock
-
-# Installation des dépendances
 npm install
-
-# Lancer le serveur de développement
 npm start
 ```
 
@@ -91,76 +154,76 @@ Application accessible sur :
 
 http://localhost:3000
 
----
+------------------------------------------------------------------------
 
-## 📋 Exécuter les tests
+##  Exécuter les tests
 
 ### Tests unitaires et intégration
 
-```bash
+``` bash
 npm test
 ```
 
 ### Tests Cypress E2E
 
-```bash
+``` bash
 npm run cypress
 ```
 
----
+------------------------------------------------------------------------
 
-## 🏗 Build & Déploiement
+##  Build & Déploiement
 
-### Build de production
-
-```bash
+``` bash
 npm run build
 ```
 
-Le déploiement sur GitHub Pages est automatique via GitHub Actions lors d’un push sur `main`.
+Le déploiement sur GitHub Pages est automatique via GitHub Actions lors
+d'un push sur `main`.
 
----
+------------------------------------------------------------------------
 
-## 📚 Documentation
+##  Documentation
 
-La documentation est générée avec :
-
-```bash
+``` bash
 npm run jsdoc
 ```
 
-Elle est automatiquement :
+La documentation est :
 
-- Générée en CI
-- Copiée dans `build/docs`
-- Déployée sur GitHub Pages
+-   Générée en CI\
+-   Copiée dans `build/docs`\
+-   Déployée automatiquement
 
----
+------------------------------------------------------------------------
 
-## 🔄 CI/CD
+##  CI/CD
 
 À chaque push sur `main`, le workflow :
 
-1. Installe les dépendances  
-2. Génère la documentation JSDoc  
-3. Lance les tests unitaires avec coverage  
-4. Envoie la couverture vers Codecov  
-5. Lance les tests Cypress  
-6. Build le projet  
-7. Déploie automatiquement sur GitHub Pages  
+1.  Installe les dépendances\
+2.  Génère la documentation JSDoc\
+3.  Lance les tests unitaires avec coverage\
+4.  Envoie la couverture vers Codecov\
+5.  Lance les tests Cypress\
+6.  Build le projet\
+7.  Déploie automatiquement sur GitHub Pages
 
----
+------------------------------------------------------------------------
 
-## ✅ Conclusion
+##  Conclusion
 
 Ce projet met en place :
 
-- ✔ Tests unitaires  
-- ✔ Tests d’intégration  
-- ✔ Tests E2E  
-- ✔ Couverture suivie avec Codecov  
-- ✔ Documentation automatique  
-- ✔ CI/CD complet  
-- ✔ Déploiement automatisé  
+-   Architecture découplée via API\
+-   Isolation complète du front-end\
+-   Gestion des erreurs 400 / 500\
+-   Tests unitaires mockés\
+-   Tests E2E interceptés\
+-   Couverture suivie avec Codecov\
+-   Documentation automatique\
+-   CI/CD complet\
+-   Déploiement automatisé
 
-Projet réalisé dans un cadre pédagogique pour maîtriser les tests, la validation métier et l’automatisation.
+Projet réalisé dans un cadre pédagogique pour maîtriser le mocking, la
+résilience UI et l'automatisation complète d'un front-end React.
