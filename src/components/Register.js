@@ -38,7 +38,7 @@ function Register({ onUserAdded }) {
 
       // Gestion erreur métier 400
       if (error.response && error.response.status === 400) {
-        toast.error("Email déjà existant.");
+        toast.error("Email déjà existant");
       }
 
       // Gestion crash serveur 500

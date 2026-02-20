@@ -56,7 +56,7 @@ describe('Tests E2E Navigation', () => {
 
     cy.visit('http://localhost:3000/#/register');
 
-    cy.wait('@getUsers');
+    // ️ SUPPRIMÉ cy.wait('@getUsers') car /register ne fait pas de GET
 
     cy.contains('Ajouter un nouvel utilisateur').should('be.visible');
 
@@ -95,7 +95,7 @@ describe('Tests E2E Navigation', () => {
 
     cy.visit('http://localhost:3000/#/register');
 
-    cy.wait('@getUsers');
+    //  SUPPRIMÉ cy.wait('@getUsers') car /register ne fait pas de GET
 
     cy.contains('Ajouter un nouvel utilisateur').should('be.visible');
 
