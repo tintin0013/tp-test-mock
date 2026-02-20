@@ -22,7 +22,7 @@
 
 ```bash
 # Clone + install
-git clone https://github.com/chloe-leonard337/projet_test.git
+git clone https://github.com/tintin0013/tp-test-mock.git
 cd projet_test/my-app
 npm install
 
