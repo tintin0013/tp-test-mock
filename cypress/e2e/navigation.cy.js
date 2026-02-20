@@ -18,8 +18,10 @@ describe('Tests E2E Navigation', () => {
 
     cy.contains('nouvelle inscription').click();
 
-    cy.get('#firstName').should('exist');
-    cy.get('#lastName').should('exist');
+    // 🔥 on attend explicitement le formulaire
+    cy.get('form').should('be.visible');
+    cy.get('#firstName', { timeout: 10000 }).should('be.visible');
+    cy.get('#lastName', { timeout: 10000 }).should('be.visible');
 
     cy.intercept('POST', 'https://jsonplaceholder.typicode.com/users', {
       statusCode: 201,
@@ -46,8 +48,9 @@ describe('Tests E2E Navigation', () => {
 
     cy.visit(`${baseUrl}/#/register`);
 
-    cy.get('#firstName').should('exist');
-    cy.get('#lastName').should('exist');
+    cy.get('form').should('be.visible');
+    cy.get('#firstName', { timeout: 10000 }).should('be.visible');
+    cy.get('#lastName', { timeout: 10000 }).should('be.visible');
 
     cy.intercept('POST', 'https://jsonplaceholder.typicode.com/users', {
       statusCode: 400,
@@ -74,8 +77,9 @@ describe('Tests E2E Navigation', () => {
 
     cy.visit(`${baseUrl}/#/register`);
 
-    cy.get('#firstName').should('exist');
-    cy.get('#lastName').should('exist');
+    cy.get('form').should('be.visible');
+    cy.get('#firstName', { timeout: 10000 }).should('be.visible');
+    cy.get('#lastName', { timeout: 10000 }).should('be.visible');
 
     cy.intercept('POST', 'https://jsonplaceholder.typicode.com/users', {
       statusCode: 500,
