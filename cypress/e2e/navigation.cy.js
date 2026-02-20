@@ -1,75 +1,125 @@
-describe('Tests E2E Navigation', { testIsolation: false }, () => {
+describe('Tests E2E Navigation', () => {
 
   it('Scénario classique', () => {
-    // On commence sans utilisateur
-    cy.clearLocalStorage('users');
 
-    cy.visit('http://localhost:3000/');
+    // Mock GET initial vide
+    cy.intercept('GET', 'https://jsonplaceholder.typicode.com/users', {
+      statusCode: 200,
+      body: []
+    }).as('getUsers');
+
+    cy.visit('http://localhost:3000/#/');
+
+    cy.wait('@getUsers');
+
     cy.contains('Bienvenue sur votre annuaire').should('be.visible');
-    cy.window().its('localStorage').invoke('getItem', 'users')
-    .then((usersStr) => {
-        const users = JSON.parse(usersStr || '[]');
-        expect(users).to.have.length(0);
-    });
     cy.contains('Aucun inscrit').should('be.visible');
-    
-    // Navigation vers Formulaire
+
+    // Navigation vers formulaire
     cy.contains('nouvelle inscription').click();
     cy.url().should('include', '/register');
     cy.contains('Ajouter un nouvel utilisateur').should('be.visible');
-    
-    // Ajout utilisateur valide
+
+    // Mock POST succès
+    cy.intercept('POST', 'https://jsonplaceholder.typicode.com/users', {
+      statusCode: 201,
+      body: { id: 11 }
+    }).as('createUser');
+
+    // Remplissage formulaire
     cy.get('#firstName').type('Marie');
     cy.get('#lastName').type('Martin');
     cy.get('#dob').type('1990-01-01');
     cy.get('#email').type('marie@test.fr');
     cy.get('#city').type('Angers');
     cy.get('#postalCode').type('49100');
-    
-    cy.get('button').contains('S\'inscrire').should('not.be.disabled').click();
-    
-    // Toast succès 
+
+    cy.get('button').contains('S\'inscrire')
+      .should('not.be.disabled')
+      .click();
+
+    cy.wait('@createUser');
+
     cy.contains('Inscription réussie').should('be.visible');
-    cy.wait(2500); 
-    
-    // Utilisateur visible
-    cy.url().should('include', '/');
-    cy.window().its('localStorage').invoke('getItem', 'users')
-    .then((usersStr) => {
-        const users = JSON.parse(usersStr || '[]');
-        expect(users).to.have.length(1);
-    });
-    cy.contains('Marie').should('be.visible');
-    cy.contains('Martin').should('be.visible');
+
   });
 
- 
-  it('Scénario Erreur', () => {
 
-    // L'utilisateur de l'autre test existe toujours
-    cy.window().its('localStorage').invoke('getItem', 'users')
-    .then((usersStr) => {
-        const users = JSON.parse(usersStr || '[]');
-        expect(users).to.have.length(1);
-    });
 
-    // Navigation vers Formulaire
+  it('Scénario Erreur 400', () => {
+
+    // Mock GET vide
+    cy.intercept('GET', 'https://jsonplaceholder.typicode.com/users', {
+      statusCode: 200,
+      body: []
+    }).as('getUsers');
+
     cy.visit('http://localhost:3000/#/register');
+
+    cy.wait('@getUsers');
+
     cy.contains('Ajouter un nouvel utilisateur').should('be.visible');
-    
-    // Tentative invalide : email déjà pris + champs vides
+
+    // Mock POST erreur 400
+    cy.intercept('POST', 'https://jsonplaceholder.typicode.com/users', {
+      statusCode: 400,
+      body: {}
+    }).as('createUserError');
+
     cy.get('#firstName').type('Jean');
-    cy.get('#email').type('marie@test.fr'); // Email DUPLIQUÉ !
-    
-    cy.get('button').contains('S\'inscrire').should('be.disabled');
-      
-    // TOUJOURS 1 utilisateur (pas incrémenté)
-    cy.window().its('localStorage').invoke('getItem', 'users')
-        .then((usersStr) => {
-            const users = JSON.parse(usersStr || '[]');
-            expect(users).to.have.length(1);
-            expect(users[0].firstName).to.equal('Marie');
-        });
+    cy.get('#lastName').type('Dupont');
+    cy.get('#dob').type('1990-01-01');
+    cy.get('#email').type('marie@test.fr');
+    cy.get('#city').type('Angers');
+    cy.get('#postalCode').type('49100');
+
+    cy.get('button').contains('S\'inscrire')
+      .should('not.be.disabled')
+      .click();
+
+    cy.wait('@createUserError');
+
+    cy.contains('Email déjà existant').should('be.visible');
 
   });
+
+
+
+  it('Scénario Erreur 500', () => {
+
+    // Mock GET vide
+    cy.intercept('GET', 'https://jsonplaceholder.typicode.com/users', {
+      statusCode: 200,
+      body: []
+    }).as('getUsers');
+
+    cy.visit('http://localhost:3000/#/register');
+
+    cy.wait('@getUsers');
+
+    cy.contains('Ajouter un nouvel utilisateur').should('be.visible');
+
+    // Mock POST erreur 500
+    cy.intercept('POST', 'https://jsonplaceholder.typicode.com/users', {
+      statusCode: 500,
+      body: {}
+    }).as('createUserCrash');
+
+    cy.get('#firstName').type('Jean');
+    cy.get('#lastName').type('Dupont');
+    cy.get('#dob').type('1990-01-01');
+    cy.get('#email').type('marie@test.fr');
+    cy.get('#city').type('Angers');
+    cy.get('#postalCode').type('49100');
+
+    cy.get('button').contains('S\'inscrire')
+      .should('not.be.disabled')
+      .click();
+
+    cy.wait('@createUserCrash');
+
+    cy.contains('Erreur serveur').should('be.visible');
+
+  });
+
 });
