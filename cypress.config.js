@@ -4,7 +4,7 @@ module.exports = defineConfig({
   allowCypressEnv: false,
 
   e2e: {
-    baseUrl: 'http://localhost:3000',
+    baseUrl: 'http://localhost:3000/tp-test-mock',
 
     setupNodeEvents(on, config) {
       // pas d'event particulier
