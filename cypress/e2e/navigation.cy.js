@@ -18,7 +18,6 @@ describe('Tests E2E Navigation', () => {
 
     cy.contains('nouvelle inscription').click();
 
-    // 🔥 on attend explicitement le formulaire
     cy.get('form').should('be.visible');
     cy.get('#firstName', { timeout: 10000 }).should('be.visible');
     cy.get('#lastName', { timeout: 10000 }).should('be.visible');
@@ -78,8 +77,10 @@ describe('Tests E2E Navigation', () => {
     cy.visit(`${baseUrl}/#/register`);
 
     cy.get('form').should('be.visible');
-    cy.get('#firstName', { timeout: 10000 }).should('be.visible');
-    cy.get('#lastName', { timeout: 10000 }).should('be.visible');
+
+    // 🔥 on s'assure que les champs ne sont PAS désactivés
+    cy.get('#firstName', { timeout: 10000 }).should('be.visible').and('not.be.disabled');
+    cy.get('#lastName', { timeout: 10000 }).should('be.visible').and('not.be.disabled');
 
     cy.intercept('POST', 'https://jsonplaceholder.typicode.com/users', {
       statusCode: 500,
