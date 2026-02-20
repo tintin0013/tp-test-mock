@@ -8,9 +8,9 @@ module.exports = defineConfig({
 
     setupNodeEvents(on, config) {
       // pas d'event particulier
-    },
+    }
 
-    testIsolation: false,
+    //  on supprime testIsolation: false
   },
 
   component: {
