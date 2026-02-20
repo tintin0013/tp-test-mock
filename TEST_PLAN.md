@@ -1,67 +1,206 @@
-# PLAN DE TESTS - Formulaire d'inscription React
-
-## 📋 **1. Contexte et objectifs**
-
-**Auteur :** LEONARD Chloé  
-**Date :** 13 février 2026  
-**Projet :** Formulaire d'inscription avec validation temps réel  
-
-**Objectifs des tests :**
-- Atteindre **100% couverture de code** sur `Form.js` (actuel : 95.77%)
-- Valider **validation temps réel** des 6 champs
-- Séparer clairement **UT** (unitaires) vs **IT** (intégration)
+# PLAN DE TESTS – Annuaire Utilisateurs React
 
 ---
 
-###  Choix entre UT et IT
+## 1️⃣ Contexte et objectifs
 
-Les tests unitaires vérifient le fonctionnement de chaque fonction indépendantes. Ils sont donc principalement présents dans module/validator.test.js et module/module.test.js.
-Pour tester le formulaire, j'ai choisi de réutiliser les fonctions qui ont été testés précédemment, j'ai donc pu me concentrer principalement sur la gestion et l'intégration des données. Pour cela, j'utilise des tests d'inégrations qui me permettent de vérifier le bon fonctionnement du formulaire (affichage d'erreurs si les valeurs entrées sont incorrectes, désactivation du bouton tant que des données ne sont pas correctes, vérification de l'incrémentation du compteur lorsqu'une inscription est compléter, ....)
+**Projet :** Annuaire utilisateurs React  
+**Type :** Application avec validation métier + localStorage + routing  
+**Stratégie :** Tests unitaires + intégration + E2E  
 
----
+### Objectifs pédagogiques
 
-### **📁 Tests Unitaires Module (module.test.js )**
-
-| **Fonction** | **Cas couverts** |
-|--------------|------------------|
-| `calculateAge()` | Âge valide/invalide/futur/vide |
-| `validatePostalCode()` | 5 chiffres/valide/invalide |
-| `validateCity()` | Ville valide/vide/chiffres/script(XSS) |
-| `verifyIdentity()` | Valid/invalid/script(XSS)/vide |
-| `verifyEmail()` | Valide/invalide/vide/caractères spéciaux |
-| `validateForm()` | Tous combos (âge/code/ville/identity/email) |
-
-**Couverture UT Module : 100% fonctions métier**
+- Valider la logique métier indépendamment de l’UI
+- Tester l’intégration complète formulaire → localStorage → affichage
+- Tester les interactions utilisateur réelles
+- Atteindre une couverture maximale
+- Séparer clairement UT / IT / E2E
+- Automatiser l’exécution via CI/CD
 
 ---
 
-### **📁 Tests Intégration (App.test.js - Inclus dans Form.test.js)**
+## 2️⃣ Tests Unitaires (UT)
 
-| **Flux E2E** | **Cas couverts** | **Composants** |
-|--------------|------------------|----------------|
-| **Soumission complète** | App → Form → localStorage → `onSubmitSuccess` → Compteur | **App + Form** |
-| **Persistance** | Données sauvées → Compteur persistant | **localStorage** |
-| **Reset UI** | Champs vidés | **Form + App** |
+Les tests unitaires vérifient les fonctions métier indépendamment de React.
+
+### 📁 module.test.js
+
+Objectif : Valider les fonctions métier pures.
+
+Fonctions testées :
+
+- `calculateAge()`
+- `validatePostalCode()`
+- `validateCity()`
+- `verifyIdentity()`
+- `verifyEmail()`
+- `validateForm()`
+
+Scénarios couverts :
+
+- Âge valide / invalide / futur
+- Personne mineure
+- Cas limite majorité exacte
+- Année bissextile
+- Email invalide
+- Code postal invalide
+- Identité invalide
+- Valeurs vides
+- Protection contre injection XSS
+- Combinaisons complètes valides
+
+Couverture module : 100% des fonctions métier.
 
 ---
 
-### En résumé 
+## 3️⃣ Tests du Formulaire (Validation temps réel)
 
-- TESTS UNITAIRES (Form.test.js) : 28 tests
-   → Validation temps réel 6 champs (invalid/null)
-   → Rendu UI + isFormValid() + soumission
+### 📁 Form.test.js
 
-- TESTS MODULE (module.test.js) : 40+ tests  
-   → calculateAge, validatePostalCode, validateCity...
-   → validateForm toutes combinaisons
+Objectif : Tester la gestion du formulaire et la validation en temps réel.
 
-- TESTS INTÉGRATION (App.test.js)
-   → Flux intégration : Gestion du formulaire -> envoie dans le localStorage -> Incrémentation du compteur
+Scénarios couverts :
 
-**Couverture :95.77%**
+- Validation des 6 champs
+- Affichage des erreurs sous les champs
+- Suppression des erreurs après correction
+- Bouton désactivé si formulaire invalide
+- Bouton activé si formulaire valide
+- Gestion des valeurs null / vides
+- Soumission valide
+- Reset des champs après soumission
+
+Ces tests vérifient :
+
+- Rendu DOM
+- Gestion des états React
+- Fonction `isFormValid()`
+- Appel de `onSubmitSuccess`
 
 ---
 
-## **4. Tests manquants (pour 100%)**
+## 4️⃣ Tests d’Intégration (IT)
 
-- Pour avoir 100% sur le Form.js, il manque principalement la correction des 2 tests en échecs (tests sur la gestion des valeurs vides pour la date de naissance et le mail)
+### 📁 App.test.js
+
+Objectif : Tester l’intégration entre :
+
+App → Form → localStorage → compteur → affichage Home
+
+Scénarios couverts :
+
+- Soumission complète valide
+- Incrémentation du compteur utilisateurs
+- Persistance des données via localStorage
+- Réaffichage correct des utilisateurs
+- Reset de l’interface après soumission
+
+Les tests utilisent :
+
+- Simulation utilisateur
+- Vérification DOM
+- Vérification localStorage via spy
+
+---
+
+## 5️⃣ Tests End-To-End (E2E)
+
+### 📁 cypress/e2e/navigation.cy.js
+
+Objectif : Tester l’application comme un vrai utilisateur.
+
+Scénarios couverts :
+
+### Navigation
+
+- Accès page Home
+- Navigation vers Register
+- Retour automatique après inscription
+
+### Scénario classique
+
+- Formulaire rempli correctement
+- Bouton activé
+- Toast succès
+- Redirection
+- Vérification localStorage
+- Affichage du nouvel utilisateur
+
+### Scénario erreur
+
+- Email déjà existant
+- Champs manquants
+- Bouton désactivé
+- Vérification que le compteur ne change pas
+
+Ces tests valident :
+
+- Routing HashRouter
+- Interaction complète UI
+- Persistance réelle navigateur
+
+---
+
+## 6️⃣ Couverture de code
+
+Objectif pédagogique : couverture maximale.
+
+La couverture est générée avec :
+
+```
+npm test
+```
+
+Elle est :
+
+- Mesurée automatiquement
+- Envoyée vers Codecov
+- Vérifiée à chaque push via GitHub Actions
+
+Couverture actuelle : >95%
+
+---
+
+## 7️⃣ Stratégie globale
+
+| Type | Objectif | Portée |
+|------|----------|--------|
+| UT | Logique métier isolée | module.js / validator.js |
+| IT | Intégration React + métier | Form.js / App.js |
+| E2E | Parcours utilisateur réel | Application complète |
+
+---
+
+## 8️⃣ Automatisation CI/CD
+
+À chaque push sur `main` :
+
+1. Installation des dépendances
+2. Génération JSDoc
+3. Tests unitaires + coverage
+4. Upload Codecov
+5. Tests Cypress E2E
+6. Build production
+7. Déploiement GitHub Pages
+
+---
+
+## 9️⃣ Conclusion
+
+La stratégie garantit :
+
+- Validation fonctionnelle complète
+- Validation DOM et états React
+- Validation des interactions utilisateur
+- Validation de la persistance localStorage
+- Sécurité UI (bouton disabled)
+- Robustesse métier
+- Exécution automatisée
+- Déploiement contrôlé
+
+Ce plan couvre intégralement :
+
+- La logique métier
+- L’intégration UI
+- Le comportement utilisateur réel
+- L’automatisation complète du projet
