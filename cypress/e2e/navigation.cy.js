@@ -18,6 +18,9 @@ describe('Tests E2E Navigation', () => {
     cy.url().should('include', '/register');
     cy.contains('Ajouter un nouvel utilisateur').should('be.visible');
 
+    cy.get('#firstName').should('exist');
+    cy.get('#lastName').should('exist');
+
     cy.intercept('POST', 'https://jsonplaceholder.typicode.com/users', {
       statusCode: 201,
       body: { id: 11 }
@@ -30,15 +33,14 @@ describe('Tests E2E Navigation', () => {
     cy.get('#city').type('Angers');
     cy.get('#postalCode').type('49100');
 
-    cy.get('button')
-      .contains("S'inscrire")
-      .should('not.be.disabled')
-      .click();
+    cy.get('button').contains("S'inscrire").click();
 
     cy.wait('@createUser');
 
     cy.contains('Inscription réussie').should('be.visible');
+
   });
+
 
 
   it('Scénario Erreur 400', () => {
@@ -52,6 +54,9 @@ describe('Tests E2E Navigation', () => {
 
     cy.contains('Ajouter un nouvel utilisateur').should('be.visible');
 
+    cy.get('#firstName').should('exist');
+    cy.get('#lastName').should('exist');
+
     cy.intercept('POST', 'https://jsonplaceholder.typicode.com/users', {
       statusCode: 400,
       body: {}
@@ -64,15 +69,14 @@ describe('Tests E2E Navigation', () => {
     cy.get('#city').type('Angers');
     cy.get('#postalCode').type('49100');
 
-    cy.get('button')
-      .contains("S'inscrire")
-      .should('not.be.disabled')
-      .click();
+    cy.get('button').contains("S'inscrire").click();
 
     cy.wait('@createUserError');
 
     cy.contains('Email déjà existant').should('be.visible');
+
   });
+
 
 
   it('Scénario Erreur 500', () => {
@@ -86,6 +90,9 @@ describe('Tests E2E Navigation', () => {
 
     cy.contains('Ajouter un nouvel utilisateur').should('be.visible');
 
+    cy.get('#firstName').should('exist');
+    cy.get('#lastName').should('exist');
+
     cy.intercept('POST', 'https://jsonplaceholder.typicode.com/users', {
       statusCode: 500,
       body: {}
@@ -98,13 +105,12 @@ describe('Tests E2E Navigation', () => {
     cy.get('#city').type('Angers');
     cy.get('#postalCode').type('49100');
 
-    cy.get('button')
-      .contains("S'inscrire")
-      .click();
+    cy.get('button').contains("S'inscrire").click();
 
     cy.wait('@createUserCrash');
 
     cy.contains('Erreur serveur').should('be.visible');
+
   });
 
 });
