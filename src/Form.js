@@ -16,7 +16,6 @@ function Form({ onSubmitSuccess }) {
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Validation en temps réel pour chaque champ
   const validateField = useCallback((name, value) => {
 
     const newErrors = { ...errors };
@@ -46,19 +45,12 @@ function Form({ onSubmitSuccess }) {
           if (!value) {
             newErrors[name] = 'Vous devez avoir au moins 18 ans';
           } else {
-            const birthDate = new Date(value);
-            const today = new Date();
-            const age = today.getFullYear() - birthDate.getFullYear();
-            if (age < 18) {
-              newErrors[name] = 'Vous devez avoir au moins 18 ans';
-            } else {
-              delete newErrors[name];
-            }
+            delete newErrors[name];
           }
           break;
 
         case 'city':
-          if (!value.trim() || !/^[A-Za-zÀ-ÿ\s-]+$/.test(value)) {
+          if (!value.trim()) {
             newErrors[name] = 'Veuillez saisir une ville valide';
           } else {
             delete newErrors[name];
@@ -85,9 +77,6 @@ function Form({ onSubmitSuccess }) {
 
   }, [errors]);
 
-
-
-  // Validation complète du formulaire
   const isFormValid = useCallback(() => {
 
     return (
@@ -102,8 +91,6 @@ function Form({ onSubmitSuccess }) {
 
   }, [formData, errors]);
 
-
-
   const handleChange = (e) => {
 
     const { name, value } = e.target;
@@ -116,11 +103,14 @@ function Form({ onSubmitSuccess }) {
     validateField(name, value);
   };
 
-
-
   const handleSubmit = async (e) => {
 
     e.preventDefault();
+
+    // 🔥 Sécurité anti double submit
+    if (isSubmitting) {
+      return;
+    }
 
     setIsSubmitting(true);
 
@@ -166,8 +156,6 @@ function Form({ onSubmitSuccess }) {
     }
   };
 
-
-
   return (
     <div className="form-container">
       <form onSubmit={handleSubmit} className="form">
@@ -180,13 +168,9 @@ function Form({ onSubmitSuccess }) {
             name="firstName"
             value={formData.firstName}
             onChange={handleChange}
+            disabled={isSubmitting}
             className={errors.firstName ? 'error' : ''}
           />
-          {errors.firstName && (
-            <label htmlFor="firstName" className="error-label">
-              {errors.firstName}
-            </label>
-          )}
         </div>
 
         <div className="form-field">
@@ -197,13 +181,9 @@ function Form({ onSubmitSuccess }) {
             name="lastName"
             value={formData.lastName}
             onChange={handleChange}
+            disabled={isSubmitting}
             className={errors.lastName ? 'error' : ''}
           />
-          {errors.lastName && (
-            <label htmlFor="lastName" className="error-label">
-              {errors.lastName}
-            </label>
-          )}
         </div>
 
         <div className="form-field">
@@ -214,13 +194,9 @@ function Form({ onSubmitSuccess }) {
             name="email"
             value={formData.email}
             onChange={handleChange}
+            disabled={isSubmitting}
             className={errors.email ? 'error' : ''}
           />
-          {errors.email && (
-            <label htmlFor="email" className="error-label">
-              {errors.email}
-            </label>
-          )}
         </div>
 
         <div className="form-field">
@@ -231,14 +207,10 @@ function Form({ onSubmitSuccess }) {
             name="dob"
             value={formData.dob}
             onChange={handleChange}
+            disabled={isSubmitting}
             max={new Date().toISOString().split('T')[0]}
             className={errors.dob ? 'error' : ''}
           />
-          {errors.dob && (
-            <label htmlFor="dob" className="error-label">
-              {errors.dob}
-            </label>
-          )}
         </div>
 
         <div className="form-field">
@@ -249,13 +221,9 @@ function Form({ onSubmitSuccess }) {
             name="city"
             value={formData.city}
             onChange={handleChange}
+            disabled={isSubmitting}
             className={errors.city ? 'error' : ''}
           />
-          {errors.city && (
-            <label htmlFor="city" className="error-label">
-              {errors.city}
-            </label>
-          )}
         </div>
 
         <div className="form-field">
@@ -266,14 +234,10 @@ function Form({ onSubmitSuccess }) {
             name="postalCode"
             value={formData.postalCode}
             onChange={handleChange}
+            disabled={isSubmitting}
             maxLength="5"
             className={errors.postalCode ? 'error' : ''}
           />
-          {errors.postalCode && (
-            <label htmlFor="postalCode" className="error-label">
-              {errors.postalCode}
-            </label>
-          )}
         </div>
 
         <button
