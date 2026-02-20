@@ -5,6 +5,18 @@ import axios from 'axios';
 
 jest.mock('axios');
 
+// 🔥 Mock de react-toastify
+const mockToastSuccess = jest.fn();
+const mockToastError = jest.fn();
+
+jest.mock('react-toastify', () => ({
+  toast: {
+    success: (...args) => mockToastSuccess(...args),
+    error: (...args) => mockToastError(...args),
+  },
+  ToastContainer: () => <div data-testid="toast-container" />
+}));
+
 /**
  * @function App
  */
@@ -67,6 +79,7 @@ describe('App - Architecture API Mockée', () => {
 
     await waitFor(() => {
       expect(axios.post).toHaveBeenCalled();
+      expect(mockToastSuccess).toHaveBeenCalledWith("Inscription réussie !");
     });
 
   });
@@ -95,6 +108,7 @@ describe('App - Architecture API Mockée', () => {
 
     await waitFor(() => {
       expect(axios.post).toHaveBeenCalled();
+      expect(mockToastError).toHaveBeenCalledWith("Email déjà existant");
     });
 
   });
@@ -123,6 +137,7 @@ describe('App - Architecture API Mockée', () => {
 
     await waitFor(() => {
       expect(axios.post).toHaveBeenCalled();
+      expect(mockToastError).toHaveBeenCalledWith("Erreur serveur. Veuillez réessayer plus tard.");
     });
 
   });
