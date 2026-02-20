@@ -45,7 +45,15 @@ describe('Tests E2E Navigation', () => {
 
   it('Scénario Erreur 400', () => {
 
+    // Mock GET users pour stabiliser le test en CI
+    cy.intercept('GET', 'https://jsonplaceholder.typicode.com/users', {
+      statusCode: 200,
+      body: []
+    }).as('getUsers');
+
     cy.visit(`${baseUrl}/#/register`);
+
+    cy.wait('@getUsers');
 
     cy.get('form').should('be.visible');
     cy.get('#firstName', { timeout: 10000 }).should('be.visible');
