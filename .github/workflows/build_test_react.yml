@@ -35,7 +35,7 @@ jobs:
 
       # Lancement des tests unitaires avec génération du coverage
       - name: Run unit tests
-        run: npm test -- --watchAll=false --coverage
+        run: npm test
 
       # Upload du coverage vers Codecov (avec token)
       - name: Upload coverage reports to Codecov
@@ -59,7 +59,7 @@ jobs:
         run: |
           npm run build
           mkdir -p build/docs
-          cp -r docs/* build/docs/
+          cp -r public/docs/* build/docs/
 
       # Configuration GitHub Pages
       - name: Setup Pages
