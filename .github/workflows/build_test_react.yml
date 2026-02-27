@@ -7,7 +7,8 @@ on:
     branches: [ main ]
 
 jobs:
-  build_test:
+
+  build-and-test:
     runs-on: ubuntu-latest
 
     strategy:
@@ -56,9 +57,63 @@ jobs:
         uses: actions/upload-pages-artifact@v3
         with:
           path: build
-          
+
+
+  publish-npm:
+    needs: build-and-test
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18.x
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Authenticate with npm
+        run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
+
+      - name: Get local version
+        id: local
+        run: echo "version=$(node -p \"require('./package.json').version\")" >> $GITHUB_OUTPUT
+
+      - name: Get published version
+        id: remote
+        run: |
+          VERSION_NPM=$(npm view @tintin0013/tintin-ci-cd-ynov version || echo "0.0.0")
+          echo "version=$VERSION_NPM" >> $GITHUB_OUTPUT
+
+      - name: Compare versions
+        id: compare
+        run: |
+          LOCAL=${{ steps.local.outputs.version }}
+          REMOTE=${{ steps.remote.outputs.version }}
+
+          if [ "$(printf '%s\n' "$REMOTE" "$LOCAL" | sort -V | tail -n1)" = "$LOCAL" ] && [ "$LOCAL" != "$REMOTE" ]; then
+            echo "publish=true" >> $GITHUB_OUTPUT
+          else
+            echo "publish=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Build NPM package
+        if: steps.compare.outputs.publish == 'true'
+        run: npm run build-npm-ci
+
+      - name: Publish to NPM
+        if: steps.compare.outputs.publish == 'true'
+        run: npm publish --access public
+
+      - name: Skip publication
+        if: steps.compare.outputs.publish == 'false'
+        run: echo "Version non supérieure. Publication ignorée."
+
+
   deploy:
-    needs: build_test
+    needs: publish-npm
     permissions: 
       pages: write
       id-token: write
