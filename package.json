@@ -1,6 +1,6 @@
 {
   "name": "@tintin0013/tintin-ci-cd-ynov",
-  "version": "0.2.0",
+  "version": "1.0.0",
   "private": false,
   "homepage": "https://tintin0013.github.io/tp-test-mock/",
   "main": "dist/index.js",
