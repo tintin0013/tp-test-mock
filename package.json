@@ -1,6 +1,6 @@
 {
   "name": "@tintin0013/tintin-ci-cd-ynov",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": false,
   "homepage": "https://tintin0013.github.io/tp-test-mock/",
   "main": "dist/index.js",
@@ -28,7 +28,8 @@
     "eject": "react-scripts eject",
     "jsdoc": "jsdoc -R ./README.md -c ./jsdoc.config.json -r -d ./public/docs",
     "cypress": "cypress open",
-    "build-npm-ci": "NODE_ENV=production rm -rf dist && mkdir dist && npx babel src --out-dir dist --ignore \"**/*.test.js\",\"**/setupTests.js\" && find dist -name \"*.test.js\" -delete && find dist -name \"setupTests.js\" -delete"  },
+    "build-npm-ci": "NODE_ENV=production rm -rf dist && mkdir dist && npx babel src --out-dir dist --ignore \"**/*.test.js\",\"**/setupTests.js\" && find dist -name \"*.test.js\" -delete && find dist -name \"setupTests.js\" -delete"
+  },
   "eslintConfig": {
     "extends": [
       "react-app",
