@@ -157,6 +157,9 @@ jobs:
       - name: Wait API
         run: sleep 10
 
+      - name: Debug containers
+        run: docker ps -a
+
       - name: Test API
         run: curl --fail http://localhost:8000/users
 
