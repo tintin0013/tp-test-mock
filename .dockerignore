@@ -1,0 +1,10 @@
+node_modules
+.git
+.gitignore
+coverage
+cypress
+src
+.env
+.vscode
+README.md
+TEST_PLAN.md
