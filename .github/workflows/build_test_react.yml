@@ -134,8 +134,6 @@ jobs:
           docker run -d \
           -e MYSQL_ROOT_PASSWORD=toto \
           -e MYSQL_DATABASE=ynov_ci \
-          -e MYSQL_USER=ynov \
-          -e MYSQL_PASSWORD=ynovpwd \
           -p 3306:3306 \
           --name mysql_container \
           migration_mysql
