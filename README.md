@@ -281,7 +281,7 @@ exécution réussie du pipeline CI/CD.
 
 ------------------------------------------------------------------------
 
-##  Conclusion
+##  Conclusion  
 
 Ce projet met en place :
 
