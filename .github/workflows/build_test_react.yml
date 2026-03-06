@@ -162,6 +162,15 @@ jobs:
       - name: Wait API
         run: sleep 10
 
+      # - name: Debug containers
+      #   run: docker ps -a
+
+      # - name: Show MySQL logs
+      #   run: docker logs mysql_container
+
+      # - name: Show API logs
+      #   run: docker logs api_container
+
       - name: Test API
         run: curl --fail http://localhost:8000/users
 
