@@ -146,7 +146,7 @@ jobs:
       - name: Start API container
         run: |
           docker run -d \
-          -e MYSQL_HOST=host.docker.internal \
+          -e MYSQL_HOST=mysql_container
           -e MYSQL_DATABASE=ynov_ci \
           -e MYSQL_USER=ynov \
           -e MYSQL_PASSWORD=ynovpwd \
