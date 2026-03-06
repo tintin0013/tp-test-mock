@@ -129,9 +129,14 @@ jobs:
       - name: Build FastAPI image
         run: docker build -f python.Dockerfile -t fastapi-api .
 
+      # création du réseau docker
+      - name: Create docker network
+        run: docker network create tp-network
+
       - name: Start MySQL container
         run: |
           docker run -d \
+          --network tp-network \
           -e MYSQL_ROOT_PASSWORD=toto \
           -e MYSQL_DATABASE=ynov_ci \
           -p 3306:3306 \
@@ -144,6 +149,7 @@ jobs:
       - name: Start API container
         run: |
           docker run -d \
+          --network tp-network \
           -e MYSQL_HOST=mysql_container \
           -e MYSQL_DATABASE=ynov_ci \
           -e MYSQL_USER=ynov \
