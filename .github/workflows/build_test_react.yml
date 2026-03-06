@@ -114,8 +114,64 @@ jobs:
         run: echo "Version non supérieure. Publication ignorée."
 
 
-  deploy:
+  docker-integration-test:
     needs: publish-npm
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Build MySQL image
+        run: docker build -t migration_mysql .
+
+      - name: Build FastAPI image
+        run: docker build -f python.Dockerfile -t fastapi-api .
+
+      - name: Start MySQL container
+        run: |
+          docker run -d \
+          -e MYSQL_ROOT_PASSWORD=toto \
+          -e MYSQL_DATABASE=ynov_ci \
+          -e MYSQL_USER=ynov \
+          -e MYSQL_PASSWORD=ynovpwd \
+          -p 3306:3306 \
+          --name mysql_container \
+          migration_mysql
+
+      - name: Wait MySQL
+        run: sleep 20
+
+      - name: Start API container
+        run: |
+          docker run -d \
+          -e MYSQL_HOST=host.docker.internal \
+          -e MYSQL_DATABASE=ynov_ci \
+          -e MYSQL_USER=ynov \
+          -e MYSQL_PASSWORD=ynovpwd \
+          -p 8000:8000 \
+          --name api_container \
+          fastapi-api
+
+      - name: Wait API
+        run: sleep 10
+
+      - name: Test API
+        run: curl --fail http://localhost:8000/users
+
+      - name: Login DockerHub
+        run: echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
+
+      - name: Tag image
+        run: docker tag fastapi-api ${{ secrets.DOCKERHUB_USERNAME }}/ynov-ci-fastapi:latest
+
+      - name: Push image
+        run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/ynov-ci-fastapi:latest
+
+
+  deploy:
+    needs: docker-integration-test
     permissions: 
       pages: write
       id-token: write
