@@ -136,7 +136,7 @@ jobs:
         run: |
           docker run -d \
           --network tp-network \
-          --network-alias mysql \
+          --hostname mysql_container \
           -e MYSQL_ROOT_PASSWORD=toto \
           -e MYSQL_DATABASE=ynov_ci \
           -e MYSQL_USER=ynov \
@@ -151,7 +151,7 @@ jobs:
         run: |
           docker run -d \
           --network tp-network \
-          -e MYSQL_HOST=mysql \
+          -e MYSQL_HOST=mysql_container \
           -e MYSQL_DATABASE=ynov_ci \
           -e MYSQL_USER=ynov \
           -e MYSQL_PASSWORD=ynovpwd \
