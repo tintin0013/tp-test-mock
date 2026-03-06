@@ -136,6 +136,7 @@ jobs:
         run: |
           docker run -d \
           --network tp-network \
+          --network-alias mysql \
           -e MYSQL_ROOT_PASSWORD=toto \
           -e MYSQL_DATABASE=ynov_ci \
           -e MYSQL_USER=ynov \
@@ -143,15 +144,14 @@ jobs:
           --name mysql_container \
           migration_mysql
 
-      - name: Wait MySQL to be ready
-        run: |
-          sleep 30
+      - name: Wait MySQL
+        run: sleep 30
 
       - name: Start API container
         run: |
           docker run -d \
           --network tp-network \
-          -e MYSQL_HOST=mysql_container \
+          -e MYSQL_HOST=mysql \
           -e MYSQL_DATABASE=ynov_ci \
           -e MYSQL_USER=ynov \
           -e MYSQL_PASSWORD=ynovpwd \
