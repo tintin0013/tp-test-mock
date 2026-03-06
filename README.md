@@ -236,7 +236,7 @@ La documentation est :
 
 ------------------------------------------------------------------------
 
-## ⚙ CI/CD
+##  CI/CD
 
 À chaque push sur `main`, le workflow :
 
@@ -248,6 +248,36 @@ La documentation est :
 6.  Build le projet\
 7.  Publie sur NPM (si version supérieure)\
 8.  Déploie automatiquement sur GitHub Pages
+
+------------------------------------------------------------------------
+
+## Docker Integration Tests
+
+Le pipeline CI/CD inclut également un **test d'intégration Docker** afin
+de vérifier le fonctionnement réel de l'API avec une base de données.
+
+Deux conteneurs sont lancés automatiquement dans le workflow :
+
+- un conteneur **MySQL** avec les migrations SQL
+- un conteneur **FastAPI** exposant l'API
+
+Les deux conteneurs communiquent via un réseau Docker interne.
+
+Une fois les services démarrés, le pipeline vérifie que l'API fonctionne
+correctement avec la commande suivante :
+curl http://localhost:8000/users
+
+Si l'API répond correctement, l'image Docker est ensuite publiée sur
+DockerHub.
+
+### Image Docker publiée
+
+L'image générée automatiquement par le pipeline est disponible ici :
+
+https://hub.docker.com/r/tintin0013/ynov-ci-fastapi
+
+Cette image est reconstruite et poussée automatiquement à chaque
+exécution réussie du pipeline CI/CD.
 
 ------------------------------------------------------------------------
 
@@ -268,3 +298,42 @@ Ce projet met en place :
 
 Projet réalisé dans un cadre pédagogique pour maîtriser le mocking,\
 la résilience UI et l'automatisation complète d'un front-end React.
+
+
+
+<!-- ## CI/CD Pipeline
+
+Aujourd'hui nous avons mis en place un pipeline **CI/CD complet avec GitHub Actions** afin d'automatiser le build, les tests, la publication et le déploiement du projet.
+
+### Étapes du pipeline
+
+Le pipeline réalise automatiquement les actions suivantes :
+
+1. Installation des dépendances Node.js
+2. Génération de la documentation **JSDoc**
+3. Exécution des **tests unitaires**
+4. Exécution des **tests Cypress**
+5. Build de l'application React
+6. Publication automatique du package sur **npm**
+7. Construction d'une image **Docker FastAPI**
+8. Test d'intégration avec **Docker + MySQL**
+9. Publication de l'image sur **DockerHub**
+10. Déploiement du site sur **GitHub Pages**
+
+### Test d'intégration Docker
+
+Le pipeline lance deux conteneurs Docker :
+
+- un conteneur **MySQL** avec les migrations SQL
+- un conteneur **FastAPI**
+
+Un test est ensuite exécuté pour vérifier que l'API fonctionne correctement :
+curl http://localhost:8000/users
+
+### Image Docker
+
+L'image Docker générée par le pipeline est disponible sur DockerHub :
+
+https://hub.docker.com/r/TON_USERNAME/ynov-ci-fastapi
+
+Cette image est automatiquement mise à jour à chaque exécution réussie du pipeline. -->

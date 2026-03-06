@@ -44,90 +44,167 @@
 
     <section>
         <article><h1>Annuaire Utilisateurs React</h1>
-<p>Application React avec routing, localStorage et stratégie complète de tests<br>
-(Unitaires + Intégration + E2E) avec CI/CD et déploiement automatique.</p>
+<p>Application React avec routing, architecture API découplée (Axios +
+JSONPlaceholder)<br>
+et stratégie complète de tests (Unitaires + Intégration + E2E) avec
+CI/CD,<br>
+publication automatique NPM et déploiement continu.</p>
 <hr>
-<h2>🎯 Objectif pédagogique</h2>
-<p>Ce projet a pour objectif de mettre en place une architecture complète autour :</p>
+<h2>Objectif pédagogique</h2>
+<p>Ce projet met en place une architecture complète autour de :</p>
 <ul>
 <li>Tests unitaires</li>
-<li>Tests d’intégration</li>
+<li>Tests d'intégration</li>
 <li>Tests E2E avec Cypress</li>
+<li>Isolation du front-end via mocking des appels API</li>
+<li>Gestion des erreurs serveur (400 / 500)</li>
 <li>Couverture de code (Codecov)</li>
 <li>Génération automatique de documentation (JSDoc)</li>
 <li>Pipeline CI/CD avec GitHub Actions</li>
+<li>Publication automatique sur NPM</li>
 <li>Déploiement automatique via GitHub Pages</li>
 </ul>
 <hr>
-<h2>🛠 Technologies</h2>
+<h2>Technologies</h2>
 <ul>
 <li>React</li>
 <li>React Router (HashRouter pour GitHub Pages)</li>
-<li>Jest (tests unitaires et intégration)</li>
-<li>Cypress (tests E2E)</li>
-<li>GitHub Actions (CI/CD)</li>
-<li>Codecov (suivi de couverture)</li>
-<li>GitHub Pages (déploiement)</li>
+<li>Axios</li>
+<li>JSONPlaceholder</li>
+<li>Jest</li>
+<li>Cypress</li>
+<li>GitHub Actions</li>
+<li>Codecov</li>
+<li>GitHub Pages</li>
+<li>NPM (Distribution)</li>
 </ul>
 <hr>
-<h2>🚀 Fonctionnalités</h2>
+<h2>Fonctionnalités</h2>
 <ul>
-<li>Inscription d’utilisateurs avec validation</li>
-<li>Stockage des utilisateurs dans le localStorage</li>
+<li>Inscription d'utilisateurs avec validation</li>
+<li>Appels API via Axios (<code>GET /users</code>, <code>POST /users</code>)</li>
 <li>Affichage dynamique de la liste des inscrits</li>
 <li>Routing entre Home et Register</li>
-<li>Validation métier (âge, email, code postal…)</li>
-<li>Tests unitaires et d’intégration Jest</li>
-<li>Tests End-To-End Cypress</li>
+<li>Validation métier (âge, email, code postal...)</li>
+<li>Gestion des erreurs métier (400 -- email déjà existant)</li>
+<li>Gestion des erreurs serveur (500 -- crash backend)</li>
+<li>Tests unitaires et d'intégration Jest avec mocking</li>
+<li>Tests E2E Cypress avec interception réseau</li>
+<li>Publication automatique du package NPM</li>
 <li>Déploiement automatique à chaque push</li>
 </ul>
 <hr>
-<h2>📦 Livrables</h2>
+<h2>Évolution d'architecture</h2>
+<p>Le projet ne repose plus sur <code>localStorage</code>.</p>
+<p>L'application est désormais découplée du backend via :</p>
+<ul>
+<li>Un service API : <code>src/services/api.js</code></li>
+<li>Axios pour les appels réseau</li>
+<li>JSONPlaceholder comme API cible</li>
+</ul>
+<p>Routes implémentées :</p>
+<ul>
+<li><code>GET /users</code></li>
+<li><code>POST /users</code></li>
+</ul>
+<p>Les composants ne connaissent pas Axios directement : ils passent par le
+service API.</p>
+<hr>
+<h2>Stratégie de Tests</h2>
+<h3>Tests Jest (Unitaires + Intégration)</h3>
+<p>Les appels API sont entièrement mockés :</p>
+<pre class="prettyprint source lang-js"><code>jest.mock('axios')
+</code></pre>
+<p>Cas testés :</p>
+<ul>
+<li>Succès 200 (GET)</li>
+<li>Succès 201 (POST)</li>
+<li>Erreur métier 400</li>
+<li>Erreur serveur 500</li>
+<li>Gestion asynchrone avec <code>async/await</code></li>
+<li>Utilisation de <code>waitFor</code> pour tester les changements d'état UI</li>
+</ul>
+<p>Aucun appel réseau réel ne sort des tests Jest.</p>
+<hr>
+<h3>Tests Cypress (E2E)</h3>
+<p>Les appels API sont interceptés :</p>
+<pre class="prettyprint source lang-js"><code>cy.intercept()
+</code></pre>
+<p>Cas simulés :</p>
+<ul>
+<li>GET 200</li>
+<li>POST 201</li>
+<li>POST 400</li>
+<li>POST 500</li>
+</ul>
+<p>Les tests E2E fonctionnent sans backend réel.</p>
+<hr>
+<h2>Publication NPM &amp; Semantic Versioning</h2>
+<p>Le projet est distribué sous forme de package NPM publié automatiquement
+via GitHub Actions.</p>
+<h3>Versioning (SemVer)</h3>
+<p>Le versioning suit la spécification <strong>Semantic Versioning</strong> :</p>
+<ul>
+<li><strong>PATCH</strong> → correction de bugs (<code>1.0.0 → 1.0.1</code>)</li>
+<li><strong>MINOR</strong> → ajout compatible (<code>1.0.1 → 1.1.0</code>)</li>
+<li><strong>MAJOR</strong> → modification incompatible (<code>1.1.0 → 2.0.0</code>)</li>
+</ul>
+<p>Les versions sont incrémentées avec :</p>
+<pre class="prettyprint source lang-bash"><code>npm version patch
+npm version minor
+npm version major
+</code></pre>
+<p>Le workflow CI compare la version locale (<code>package.json</code>) à la version
+publiée sur NPM.</p>
+<ul>
+<li>Si la version locale est supérieure → publication automatique.</li>
+<li>Sinon → publication ignorée (logique de bypass).</li>
+</ul>
+<h3>Package publié</h3>
+<p>https://www.npmjs.com/package/@tintin0013/tintin-ci-cd-ynov</p>
+<hr>
+<h2>Livrables</h2>
 <ul>
 <li>
-<p><strong>Dépôt GitHub</strong> :<br>
+<p>Dépôt GitHub<br>
 https://github.com/tintin0013/tp-test-mock</p>
 </li>
 <li>
-<p><strong>Application déployée</strong> :<br>
+<p>Application déployée<br>
 https://tintin0013.github.io/tp-test-mock/</p>
 </li>
 <li>
-<p><strong>Documentation JSDoc</strong> :<br>
+<p>Documentation JSDoc<br>
 https://tintin0013.github.io/tp-test-mock/docs/</p>
 </li>
 <li>
-<p><strong>Tableau Codecov</strong> :<br>
+<p>Tableau Codecov<br>
 https://codecov.io/gh/tintin0013/tp-test-mock</p>
 </li>
 </ul>
 <hr>
-<h2>🏗 Organisation du projet</h2>
-<p>Le projet est structuré autour de :</p>
+<h2>Organisation du projet</h2>
 <ul>
-<li><code>src/</code> → Application React (composants, logique métier, validations)</li>
-<li><code>module/</code> → Logique métier et règles de validation</li>
-<li><code>*.test.js</code> → Tests unitaires et d’intégration</li>
-<li><code>cypress/</code> → Tests End-To-End</li>
+<li><code>src/services/api.js</code> → Service Axios</li>
+<li><code>src/components/</code> → Home &amp; Register</li>
+<li><code>src/module/</code> → Logique métier &amp; validations</li>
+<li><code>*.test.js</code> → Tests Jest</li>
+<li><code>cypress/</code> → Tests E2E</li>
 <li><code>.github/workflows/</code> → Pipeline CI/CD</li>
 <li><code>public/docs/</code> → Documentation générée automatiquement</li>
+<li><code>dist/</code> → Build pour distribution NPM</li>
 </ul>
 <hr>
 <h2>▶ Démarrage rapide</h2>
-<pre class="prettyprint source lang-bash"><code># Clone du projet
-git clone https://github.com/tintin0013/tp-test-mock.git
+<pre class="prettyprint source lang-bash"><code>git clone https://github.com/tintin0013/tp-test-mock.git
 cd tp-test-mock
-
-# Installation des dépendances
 npm install
-
-# Lancer le serveur de développement
 npm start
 </code></pre>
 <p>Application accessible sur :</p>
 <p>http://localhost:3000</p>
 <hr>
-<h2>📋 Exécuter les tests</h2>
+<h2>Exécuter les tests</h2>
 <h3>Tests unitaires et intégration</h3>
 <pre class="prettyprint source lang-bash"><code>npm test
 </code></pre>
@@ -135,47 +212,51 @@ npm start
 <pre class="prettyprint source lang-bash"><code>npm run cypress
 </code></pre>
 <hr>
-<h2>🏗 Build &amp; Déploiement</h2>
-<h3>Build de production</h3>
+<h2>Build &amp; Déploiement</h2>
 <pre class="prettyprint source lang-bash"><code>npm run build
 </code></pre>
-<p>Le déploiement sur GitHub Pages est automatique via GitHub Actions lors d’un push sur <code>main</code>.</p>
+<p>Le déploiement sur GitHub Pages est automatique via GitHub Actions lors
+d'un push sur <code>main</code>.</p>
 <hr>
-<h2>📚 Documentation</h2>
-<p>La documentation est générée avec :</p>
+<h2>Documentation</h2>
 <pre class="prettyprint source lang-bash"><code>npm run jsdoc
 </code></pre>
-<p>Elle est automatiquement :</p>
+<p>La documentation est :</p>
 <ul>
 <li>Générée en CI</li>
 <li>Copiée dans <code>build/docs</code></li>
-<li>Déployée sur GitHub Pages</li>
+<li>Déployée automatiquement</li>
 </ul>
 <hr>
-<h2>🔄 CI/CD</h2>
+<h2>⚙ CI/CD</h2>
 <p>À chaque push sur <code>main</code>, le workflow :</p>
 <ol>
-<li>Installe les dépendances</li>
-<li>Génère la documentation JSDoc</li>
-<li>Lance les tests unitaires avec coverage</li>
-<li>Envoie la couverture vers Codecov</li>
-<li>Lance les tests Cypress</li>
-<li>Build le projet</li>
+<li>Installe les dépendances\</li>
+<li>Génère la documentation JSDoc\</li>
+<li>Lance les tests unitaires avec coverage\</li>
+<li>Envoie la couverture vers Codecov\</li>
+<li>Lance les tests Cypress\</li>
+<li>Build le projet\</li>
+<li>Publie sur NPM (si version supérieure)\</li>
 <li>Déploie automatiquement sur GitHub Pages</li>
 </ol>
 <hr>
-<h2>✅ Conclusion</h2>
+<h2>Conclusion</h2>
 <p>Ce projet met en place :</p>
 <ul>
-<li>✔ Tests unitaires</li>
-<li>✔ Tests d’intégration</li>
-<li>✔ Tests E2E</li>
-<li>✔ Couverture suivie avec Codecov</li>
-<li>✔ Documentation automatique</li>
-<li>✔ CI/CD complet</li>
-<li>✔ Déploiement automatisé</li>
+<li>Architecture découplée via API</li>
+<li>Isolation complète du front-end</li>
+<li>Gestion des erreurs 400 / 500</li>
+<li>Tests unitaires mockés</li>
+<li>Tests E2E interceptés</li>
+<li>Couverture suivie avec Codecov</li>
+<li>Documentation automatique</li>
+<li>CI/CD complet</li>
+<li>Publication automatique NPM</li>
+<li>Déploiement automatisé</li>
 </ul>
-<p>Projet réalisé dans un cadre pédagogique pour maîtriser les tests, la validation métier et l’automatisation.</p></article>
+<p>Projet réalisé dans un cadre pédagogique pour maîtriser le mocking,<br>
+la résilience UI et l'automatisation complète d'un front-end React.</p></article>
     </section>
 
 
@@ -186,7 +267,7 @@ npm start
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#App">App</a></li><li><a href="global.html#Home">Home</a></li><li><a href="global.html#calculateAge">calculateAge</a></li><li><a href="global.html#calculateAgeTestsunitairespourlafonctioncalculateAgeLafonctiondoitretournerl'%25C3%25A2ged'unepersonneenann%25C3%25A9es,enfonctiondesadatedenaissance.">calculateAge
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#App">App</a></li><li><a href="global.html#calculateAge">calculateAge</a></li><li><a href="global.html#calculateAgeTestsunitairespourlafonctioncalculateAgeLafonctiondoitretournerl'%25C3%25A2ged'unepersonneenann%25C3%25A9es,enfonctiondesadatedenaissance.">calculateAge
 Tests unitaires pour la fonction calculateAge
 La fonction doit retourner l'âge d'une personne en années, en fonction de sa date de naissance.</a></li><li><a href="global.html#handleSubmit">handleSubmit</a></li><li><a href="global.html#validateCity">validateCity</a></li><li><a href="global.html#validateField">validateField</a></li><li><a href="global.html#validateForm">validateForm</a></li><li><a href="global.html#validateFormTestsunitairespourlafonctionvalidateForm">validateForm
 Tests unitaires pour la fonction validateForm</a></li><li><a href="global.html#validatePostalCode">validatePostalCode</a></li><li><a href="global.html#validatePostalCodeTestsunitairespourlavalidationducodepostal">validatePostalCode
@@ -197,7 +278,7 @@ Tests unitaires pour la fonction verifyIdentity</a></li></ul>
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.5</a> on Fri Feb 20 2026 12:43:45 GMT+0100 (Central European Standard Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.5</a> on Fri Mar 06 2026 20:39:50 GMT+0100 (Central European Standard Time)
 </footer>
 
 <script> prettyPrint(); </script>
