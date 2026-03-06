@@ -140,7 +140,6 @@ jobs:
           -e MYSQL_DATABASE=ynov_ci \
           -e MYSQL_USER=ynov \
           -e MYSQL_PASSWORD=ynovpwd \
-          -p 3306:3306 \
           --name mysql_container \
           migration_mysql
 
@@ -164,6 +163,12 @@ jobs:
 
       - name: Debug containers
         run: docker ps -a
+
+      - name: Show MySQL logs
+        run: docker logs mysql_container
+
+      - name: Show API logs
+        run: docker logs api_container
 
       - name: Test API
         run: curl --fail http://localhost:8000/users
