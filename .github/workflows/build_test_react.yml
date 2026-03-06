@@ -143,8 +143,9 @@ jobs:
           --name mysql_container \
           migration_mysql
 
-      - name: Wait MySQL
-        run: sleep 20
+      - name: Wait MySQL to be ready
+        run: |
+          sleep 30
 
       - name: Start API container
         run: |
