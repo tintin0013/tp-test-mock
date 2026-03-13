@@ -8,3 +8,8 @@ src
 .vscode
 README.md
 TEST_PLAN.md
+
+__pycache__/
+*.pyc
+*.pyo
+*.pyd

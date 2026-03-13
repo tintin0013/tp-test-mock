@@ -137,10 +137,10 @@ jobs:
           docker run -d \
           --network tp-network \
           --network-alias mysql \
-          -e MYSQL_ROOT_PASSWORD=toto \
-          -e MYSQL_DATABASE=ynov_ci \
-          -e MYSQL_USER=ynov \
-          -e MYSQL_PASSWORD=ynovpwd \
+          -e MYSQL_ROOT_PASSWORD=${{ secrets.MYSQL_ROOT_PASSWORD }} \
+          -e MYSQL_DATABASE=${{ secrets.MYSQL_DATABASE }} \
+          -e MYSQL_USER=${{ secrets.MYSQL_USER }} \
+          -e MYSQL_PASSWORD=${{ secrets.MYSQL_PASSWORD }} \
           --name mysql_container \
           migration_mysql
 
@@ -152,9 +152,9 @@ jobs:
           docker run -d \
           --network tp-network \
           -e MYSQL_HOST=mysql \
-          -e MYSQL_DATABASE=ynov_ci \
-          -e MYSQL_USER=ynov \
-          -e MYSQL_PASSWORD=ynovpwd \
+          -e MYSQL_DATABASE=${{ secrets.MYSQL_DATABASE }} \
+          -e MYSQL_USER=${{ secrets.MYSQL_USER }} \
+          -e MYSQL_PASSWORD=${{ secrets.MYSQL_PASSWORD }} \
           -p 8000:8000 \
           --name api_container \
           fastapi-api
