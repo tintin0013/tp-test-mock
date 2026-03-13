@@ -123,53 +123,14 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Build MySQL image
-        run: docker build -t migration_mysql .
+      - name: Start containers with docker compose
+        run: docker compose up -d --build
 
-      - name: Build FastAPI image
-        run: docker build -f python.Dockerfile -t fastapi-api .
+      - name: Check containers
+        run: docker compose ps
 
-      - name: Create docker network
-        run: docker network create tp-network
-
-      - name: Start MySQL container
-        run: |
-          docker run -d \
-          --network tp-network \
-          --network-alias mysql \
-          -e MYSQL_ROOT_PASSWORD=${{ secrets.MYSQL_ROOT_PASSWORD }} \
-          -e MYSQL_DATABASE=${{ secrets.MYSQL_DATABASE }} \
-          -e MYSQL_USER=${{ secrets.MYSQL_USER }} \
-          -e MYSQL_PASSWORD=${{ secrets.MYSQL_PASSWORD }} \
-          --name mysql_container \
-          migration_mysql
-
-      - name: Wait MySQL
-        run: sleep 30
-
-      - name: Start API container
-        run: |
-          docker run -d \
-          --network tp-network \
-          -e MYSQL_HOST=mysql \
-          -e MYSQL_DATABASE=${{ secrets.MYSQL_DATABASE }} \
-          -e MYSQL_USER=${{ secrets.MYSQL_USER }} \
-          -e MYSQL_PASSWORD=${{ secrets.MYSQL_PASSWORD }} \
-          -p 8000:8000 \
-          --name api_container \
-          fastapi-api
-
-      - name: Wait API
-        run: sleep 10
-
-      # - name: Debug containers
-      #   run: docker ps -a
-
-      # - name: Show MySQL logs
-      #   run: docker logs mysql_container
-
-      # - name: Show API logs
-      #   run: docker logs api_container
+      - name: Wait services
+        run: sleep 15
 
       - name: Test API
         run: curl --fail http://localhost:8000/users
@@ -178,7 +139,7 @@ jobs:
         run: echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
 
       - name: Tag image
-        run: docker tag fastapi-api ${{ secrets.DOCKERHUB_USERNAME }}/ynov-ci-fastapi:latest
+        run: docker tag tp-test-mock-server ${{ secrets.DOCKERHUB_USERNAME }}/ynov-ci-fastapi:latest
 
       - name: Push image
         run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/ynov-ci-fastapi:latest
