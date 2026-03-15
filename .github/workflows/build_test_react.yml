@@ -134,8 +134,13 @@ jobs:
       - name: Check containers
         run: docker compose ps
 
-      - name: Wait services
-        run: sleep 15
+      - name: Wait API
+        run: |
+          for i in {1..30}; do
+            curl -s http://localhost:8000/users && break
+            echo "Waiting for API..."
+            sleep 2
+          done
 
       - name: Test API
         run: curl --fail http://localhost:8000/users
