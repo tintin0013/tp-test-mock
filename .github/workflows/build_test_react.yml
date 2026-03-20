@@ -40,8 +40,7 @@ jobs:
       - name: Cypress run
         uses: cypress-io/github-action@v6
         with:
-          start: npm start
-          wait-on: http://localhost:3000/tp-test-mock
+          wait-on: http://localhost:3000
           browser: chrome
 
       - name: Build project
