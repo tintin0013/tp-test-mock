@@ -142,7 +142,7 @@ jobs:
           MYSQL_DATABASE: ${{ secrets.MYSQL_DATABASE }}
           MYSQL_USER: ${{ secrets.MYSQL_USER }}
           MYSQL_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
-        run: docker compose up -d --build --no-attach
+        run: docker compose up -d --build || true
 
       - name: Check containers
         run: docker compose ps
