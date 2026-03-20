@@ -4,9 +4,9 @@ describe('Tests E2E Navigation', () => {
 
   it('Scénario classique', () => {
 
-    cy.intercept('GET', 'https://jsonplaceholder.typicode.com/users', {
+    cy.intercept('GET', 'http://localhost:8000/users', {
       statusCode: 200,
-      body: []
+      body: { utilisateurs: [] }
     }).as('getUsers');
 
     cy.visit(`${baseUrl}/#/`);
@@ -20,7 +20,7 @@ describe('Tests E2E Navigation', () => {
 
     cy.contains('Ajouter un nouvel utilisateur', { timeout: 10000 }).should('be.visible');
 
-    cy.intercept('POST', 'https://jsonplaceholder.typicode.com/users', {
+    cy.intercept('POST', 'http://localhost:8000/users', {
       statusCode: 201,
       body: { id: 11 }
     }).as('createUser');
@@ -43,9 +43,7 @@ describe('Tests E2E Navigation', () => {
 
   it('Scénario Erreur 400', () => {
 
-    // ⚠️ PAS de GET ici
-
-    cy.intercept('POST', 'https://jsonplaceholder.typicode.com/users', {
+    cy.intercept('POST', 'http://localhost:8000/users', {
       statusCode: 400,
       body: {}
     }).as('createUserError');
@@ -72,7 +70,7 @@ describe('Tests E2E Navigation', () => {
 
   it.skip('Scénario Erreur 500', () => {
 
-    cy.intercept('POST', 'https://jsonplaceholder.typicode.com/users', {
+    cy.intercept('POST', 'http://localhost:8000/users', {
       statusCode: 500,
       body: {}
     }).as('createUserCrash');
