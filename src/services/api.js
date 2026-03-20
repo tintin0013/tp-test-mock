@@ -3,7 +3,7 @@
 import axios from "axios";
 
 // URL de base JSONPlaceholder
-const BASE_URL = "https://jsonplaceholder.typicode.com";
+const BASE_URL = `http://localhost:${process.env.REACT_APP_SERVER_PORT}`;
 
 // ==============================
 // Récupérer la liste des utilisateurs
@@ -11,7 +11,23 @@ const BASE_URL = "https://jsonplaceholder.typicode.com";
 export const getUsers = async () => {
   try {
     const response = await axios.get(`${BASE_URL}/users`);
-    return response.data;
+
+    const utilisateurs = response.data.utilisateurs;
+
+    const users = utilisateurs.map((u) => {
+      return {
+        id: u[0],
+        firstName: u[2],
+        lastName: u[1],
+        email: u[3],
+        address: {
+          city: u[6]
+        }
+      };
+    });
+
+    return users;
+
   } catch (error) {
     // On relance l'erreur pour que le composant la gère
     throw error;
