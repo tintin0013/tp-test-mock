@@ -3,7 +3,9 @@
 import axios from "axios";
 
 // URL de base JSONPlaceholder
-const BASE_URL = `http://localhost:${process.env.REACT_APP_SERVER_PORT}`;
+const PORT = process.env.REACT_APP_SERVER_PORT || 8000;
+
+const BASE_URL = `http://localhost:${PORT}`;
 
 // ==============================
 // Récupérer la liste des utilisateurs
