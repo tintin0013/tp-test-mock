@@ -30,7 +30,7 @@ describe('App - Architecture API Mockée', () => {
   it('affiche la page d’accueil avec les utilisateurs mockés (GET 200)', async () => {
 
     axios.get.mockResolvedValue({
-      data: []
+      data: { utilisateurs: [] }
     });
 
     render(<App />);
@@ -45,7 +45,7 @@ describe('App - Architecture API Mockée', () => {
 
   it('navigue vers la page inscription', async () => {
 
-    axios.get.mockResolvedValue({ data: [] });
+    axios.get.mockResolvedValue({ data: { utilisateurs: [] } });
 
     render(<App />);
 
@@ -58,7 +58,7 @@ describe('App - Architecture API Mockée', () => {
 
   it('POST 201 → inscription réussie + redirection', async () => {
 
-    axios.get.mockResolvedValue({ data: [] });
+    axios.get.mockResolvedValue({ data: { utilisateurs: [] } });
 
     axios.post.mockResolvedValue({
       data: { id: 11 }
@@ -87,7 +87,7 @@ describe('App - Architecture API Mockée', () => {
 
   it('POST 400 → email déjà existant', async () => {
 
-    axios.get.mockResolvedValue({ data: [] });
+    axios.get.mockResolvedValue({ data: { utilisateurs: [] } });
 
     axios.post.mockRejectedValue({
       response: { status: 400 }
@@ -116,7 +116,7 @@ describe('App - Architecture API Mockée', () => {
 
   it('POST 500 → crash serveur géré proprement', async () => {
 
-    axios.get.mockResolvedValue({ data: [] });
+    axios.get.mockResolvedValue({ data: { utilisateurs: [] } });
 
     axios.post.mockRejectedValue({
       response: { status: 500 }
