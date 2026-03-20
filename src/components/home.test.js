@@ -14,15 +14,17 @@ describe('Home - appels API mockés', () => {
   it('affiche les utilisateurs en cas de succès 200', async () => {
 
     axios.get.mockResolvedValue({
-      data: [
-        {
-          id: 1,
-          firstName: 'Marie',
-          lastName: 'Martin',
-          email: 'marie@test.fr',
-          address: { city: 'Angers' }
-        }
-      ]
+      data: {
+        utilisateurs: [
+          {
+            id: 1,
+            firstName: 'Marie',
+            lastName: 'Martin',
+            email: 'marie@test.fr',
+            address: { city: 'Angers' }
+          }
+        ]
+      }
     });
 
     render(<Home />, { wrapper: BrowserRouter });
@@ -52,7 +54,9 @@ describe('Home - appels API mockés', () => {
   it('affiche "Aucun inscrit" si la liste est vide', async () => {
 
     axios.get.mockResolvedValue({
-      data: []
+      data: {
+        utilisateurs: []
+      }
     });
 
     render(<Home />, { wrapper: BrowserRouter });
