@@ -16,13 +16,7 @@ describe('Home - appels API mockés', () => {
     axios.get.mockResolvedValue({
       data: {
         utilisateurs: [
-          {
-            id: 1,
-            firstName: 'Marie',
-            lastName: 'Martin',
-            email: 'marie@test.fr',
-            address: { city: 'Angers' }
-          }
+          [1, "Marie", "Martin", "marie@test.fr", "1990-01-01", "France", "Angers", "49000"]
         ]
       }
     });
