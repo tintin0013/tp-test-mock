@@ -37,6 +37,20 @@ jobs:
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
 
+          
+      - name: Start backend
+        run: |
+          pip install -r server/requirements.txt
+          uvicorn server.main:app --host 0.0.0.0 --port 8000 &
+      
+      - name: Wait backend
+        run: |
+          for i in {1..20}; do
+            curl -s http://localhost:8000/users && break
+            echo "Waiting backend..."
+            sleep 2
+          done
+
       - name: Cypress run
         uses: cypress-io/github-action@v6
         with:
