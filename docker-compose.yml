@@ -35,6 +35,11 @@ services:
       - "8000:8000"
     volumes:
       - ./server:/app
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/users"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
 
   adminer:
     image: adminer
@@ -61,5 +66,6 @@ services:
       - ./package-lock.json:/app/package-lock.json
       - /app/node_modules
     depends_on:
-      - server
+      server:
+        condition: service_healthy
     command: npm start
